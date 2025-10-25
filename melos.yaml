@@ -1,0 +1,8 @@
+name: my_dart_frog_project_1
+
+packages:
+  - packages/*
+
+scripts:
+  analyze:
+    exec: dart analyze .

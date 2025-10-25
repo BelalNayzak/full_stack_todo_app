@@ -1,0 +1,10 @@
+name: full_stack_todo_app
+description: A full-stack Flutter & Dart Frog Todo App
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dev_dependencies:
+  melos: ^6.3.3
