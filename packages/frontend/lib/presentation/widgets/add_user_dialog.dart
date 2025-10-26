@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../viewmodels/user_viewmodel.dart';
+import 'package:frontend_flutter/frontend.dart';
 
 class AddUserDialog extends StatefulWidget {
   const AddUserDialog({super.key});
@@ -79,7 +76,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
 
   void _createUser() {
     if (_formKey.currentState!.validate()) {
-      context.read<UserCubit>().createUser(
+      context.read<UserCubit>().addUser(
         name: _nameController.text,
         email: _emailController.text,
       );

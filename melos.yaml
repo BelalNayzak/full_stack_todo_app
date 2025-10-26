@@ -1,7 +1,9 @@
-name: my_dart_frog_project_1
+name: full_stack_todo_app
 
 packages:
-  - packages/*
+  - packages/shared
+  - packages/backend
+  - packages/frontend
 
 scripts:
   analyze:

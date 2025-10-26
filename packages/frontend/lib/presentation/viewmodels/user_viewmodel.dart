@@ -1,10 +1,4 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:shared/shared.dart';
-
-import '../../core/network/network_exception.dart';
-import '../../data/models/create_user_dto.dart';
-import '../../data/services/user_service.dart';
+import 'package:frontend_flutter/frontend.dart';
 
 // State classes for different UI states
 class UserState extends Equatable {
@@ -54,17 +48,13 @@ class UserCubit extends Cubit<UserState> {
 
     try {
       final response = await _userService.getAllUsers();
-      if (response.success) {
-        emit(
-          state.copyWith(
-            users: response.data ?? [],
-            isLoading: false,
-            message: response.message,
-          ),
-        );
-      } else {
-        emit(state.copyWith(isLoading: false, error: response.message));
-      }
+      emit(
+        state.copyWith(
+          users: response,
+          isLoading: false,
+          message: 'All users loaded successfully.',
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(
@@ -78,25 +68,20 @@ class UserCubit extends Cubit<UserState> {
   }
 
   // Create a new user
-  Future<void> createUser({required String name, required String email}) async {
+  Future<void> addUser({required String name, required String email}) async {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final createUserDto = CreateUserDto(name: name, email: email);
-
-      final response = await _userService.createUser(createUserDto);
-      if (response.success && response.data != null) {
-        final updatedUsers = [response.data!, ...state.users];
-        emit(
-          state.copyWith(
-            users: updatedUsers,
-            isLoading: false,
-            message: response.message,
-          ),
-        );
-      } else {
-        emit(state.copyWith(isLoading: false, error: response.message));
-      }
+      final userModel = UserModel(name: name, email: email, id: null);
+      final response = await _userService.addUser(userModel);
+      final updatedUsers = [response, ...state.users];
+      emit(
+        state.copyWith(
+          users: updatedUsers,
+          isLoading: false,
+          message: 'User added successfully.',
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(

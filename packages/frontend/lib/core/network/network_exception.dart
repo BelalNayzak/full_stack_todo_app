@@ -19,3 +19,7 @@ class TimeoutException extends NetworkException {
 class UnknownException extends NetworkException {
   const UnknownException({required super.message, super.statusCode});
 }
+
+class GeneralException extends NetworkException {
+  const GeneralException({required super.message, super.statusCode});
+}

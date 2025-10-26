@@ -1,7 +1,4 @@
-import 'package:dio/dio.dart';
-import 'package:requests_inspector/requests_inspector.dart';
-
-import '../constants/api_constants.dart';
+import 'package:frontend_flutter/frontend.dart';
 
 class DioClient {
   static DioClient? _instance;

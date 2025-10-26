@@ -1,16 +1,10 @@
-import 'package:dio/dio.dart';
-import 'package:shared/shared.dart';
+import 'package:frontend_flutter/frontend.dart';
 
-import '../../core/constants/api_constants.dart';
-import '../../core/network/api_response.dart';
-import '../../core/network/dio_client.dart';
-import '../../core/network/network_exception.dart';
-import '../models/create_user_dto.dart';
-
-class UserService {
+class UserService implements UserRepo {
   final Dio _dio = DioClient.instance.dio;
 
-  Future<ApiResponse<List<UserModel>>> getAllUsers() async {
+  @override
+  Future<List<UserModel>> getAllUsers() async {
     try {
       final response = await _dio.get(ApiConstants.usersEndpoint);
 
@@ -19,13 +13,9 @@ class UserService {
         final usersList = (data['data'] as List)
             .map((json) => UserModel.fromJson(json as Map<String, dynamic>))
             .toList();
-
-        return ApiResponse.success(
-          message: data['message'] as String,
-          data: usersList,
-        );
+        return usersList;
       } else {
-        return ApiResponse.error(message: 'Failed to fetch users');
+        throw GeneralException(message: 'Failed to fetch users');
       }
     } on DioException catch (e) {
       throw _handleDioException(e);
@@ -34,20 +24,17 @@ class UserService {
     }
   }
 
-  Future<ApiResponse<UserModel>> getUserById(int id) async {
+  @override
+  Future<UserModel> getUser(int id) async {
     try {
       final response = await _dio.get('${ApiConstants.usersEndpoint}/$id');
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         final user = UserModel.fromJson(data['data'] as Map<String, dynamic>);
-
-        return ApiResponse.success(
-          message: data['message'] as String,
-          data: user,
-        );
+        return user;
       } else {
-        return ApiResponse.error(message: 'Failed to fetch user');
+        throw GeneralException(message: 'Failed to fetch user');
       }
     } on DioException catch (e) {
       throw _handleDioException(e);
@@ -56,23 +43,20 @@ class UserService {
     }
   }
 
-  Future<ApiResponse<UserModel>> createUser(CreateUserDto createUserDto) async {
+  @override
+  Future<UserModel> addUser(UserModel userModel) async {
     try {
       final response = await _dio.post(
         ApiConstants.usersEndpoint,
-        data: createUserDto.toJson(),
+        data: userModel.toJson(),
       );
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         final user = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-
-        return ApiResponse.success(
-          message: data['message'] as String,
-          data: user,
-        );
+        return user;
       } else {
-        return ApiResponse.error(message: 'Failed to create user');
+        throw GeneralException(message: 'Failed to create user');
       }
     } on DioException catch (e) {
       throw _handleDioException(e);
@@ -80,6 +64,49 @@ class UserService {
       throw UnknownException(message: e.toString());
     }
   }
+
+  @override
+  Future<UserModel?> deleteUser(int id) async {
+    try {
+      final response = await _dio.delete('${ApiConstants.usersEndpoint}/$id');
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        final user = UserModel.fromJson(data['data'] as Map<String, dynamic>);
+        return user;
+      } else {
+        throw GeneralException(message: 'Failed to delete user');
+      }
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<UserModel> updateUser(UserModel updatedUserModel) async {
+    try {
+      final response = await _dio.put(
+        ApiConstants.usersEndpoint,
+        data: updatedUserModel.toJson(),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        final user = UserModel.fromJson(data['user'] as Map<String, dynamic>);
+        return user;
+      } else {
+        throw GeneralException(message: 'Failed to update user');
+      }
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  ///
 
   NetworkException _handleDioException(DioException e) {
     switch (e.type) {

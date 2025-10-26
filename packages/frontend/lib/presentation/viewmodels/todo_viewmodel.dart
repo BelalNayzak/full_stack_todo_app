@@ -1,11 +1,4 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:shared/shared.dart';
-
-import '../../core/network/network_exception.dart';
-import '../../data/models/create_todo_dto.dart';
-import '../../data/models/update_todo_dto.dart';
-import '../../data/services/todo_service.dart';
+import 'package:frontend_flutter/frontend.dart';
 
 // State classes for different UI states
 class TodoState extends Equatable {
@@ -51,17 +44,13 @@ class TodoCubit extends Cubit<TodoState> {
 
     try {
       final response = await _todoService.getAllTodos();
-      if (response.success) {
-        emit(
-          state.copyWith(
-            todos: response.data ?? [],
-            isLoading: false,
-            message: response.message,
-          ),
-        );
-      } else {
-        emit(state.copyWith(isLoading: false, error: response.message));
-      }
+      emit(
+        state.copyWith(
+          todos: response,
+          isLoading: false,
+          message: 'All Tasks loaded successfully.',
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(
@@ -85,7 +74,8 @@ class TodoCubit extends Cubit<TodoState> {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final createTodoDto = CreateTodoDto(
+      final todoModel = TodoModel(
+        id: null,
         title: title,
         desc: desc,
         priority: priority,
@@ -93,19 +83,15 @@ class TodoCubit extends Cubit<TodoState> {
         userIdFKey: userId,
       );
 
-      final response = await _todoService.createTodo(createTodoDto);
-      if (response.success && response.data != null) {
-        final updatedTodos = [response.data!, ...state.todos];
-        emit(
-          state.copyWith(
-            todos: updatedTodos,
-            isLoading: false,
-            message: response.message,
-          ),
-        );
-      } else {
-        emit(state.copyWith(isLoading: false, error: response.message));
-      }
+      final response = await _todoService.addTodo(todoModel);
+      final updatedTodos = [response, ...state.todos];
+      emit(
+        state.copyWith(
+          todos: updatedTodos,
+          isLoading: false,
+          message: 'Todo created successfully.',
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(
@@ -129,30 +115,27 @@ class TodoCubit extends Cubit<TodoState> {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final updateTodoDto = UpdateTodoDto(
+      final todoModel = TodoModel(
         id: id,
+        userIdFKey: null,
         title: title,
         desc: desc,
         priority: priority,
         status: status,
       );
 
-      final response = await _todoService.updateTodo(updateTodoDto);
-      if (response.success && response.data != null) {
-        final updatedTodos = state.todos.map((todo) {
-          return todo.id == id ? response.data! : todo;
-        }).toList();
+      final response = await _todoService.updateTodo(todoModel);
+      final updatedTodos = state.todos.map((todo) {
+        return todo.id == id ? response : todo;
+      }).toList();
 
-        emit(
-          state.copyWith(
-            todos: updatedTodos,
-            isLoading: false,
-            message: response.message,
-          ),
-        );
-      } else {
-        emit(state.copyWith(isLoading: false, error: response.message));
-      }
+      emit(
+        state.copyWith(
+          todos: updatedTodos,
+          isLoading: false,
+          message: 'Todo updated successfully.',
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(
@@ -170,21 +153,15 @@ class TodoCubit extends Cubit<TodoState> {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final response = await _todoService.deleteTodo(id);
-      if (response.success) {
-        final updatedTodos = state.todos
-            .where((todo) => todo.id != id)
-            .toList();
-        emit(
-          state.copyWith(
-            todos: updatedTodos,
-            isLoading: false,
-            message: response.message,
-          ),
-        );
-      } else {
-        emit(state.copyWith(isLoading: false, error: response.message));
-      }
+      await _todoService.deleteTodo(id);
+      final updatedTodos = state.todos.where((todo) => todo.id != id).toList();
+      emit(
+        state.copyWith(
+          todos: updatedTodos,
+          isLoading: false,
+          message: 'Todo deleted successfully.',
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(

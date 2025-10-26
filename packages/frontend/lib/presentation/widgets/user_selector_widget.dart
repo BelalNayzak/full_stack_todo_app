@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared/shared.dart';
-
-import '../viewmodels/user_viewmodel.dart';
+import 'package:frontend_flutter/frontend.dart';
 
 class UserSelectorWidget extends StatelessWidget {
   const UserSelectorWidget({super.key});
