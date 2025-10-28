@@ -4,7 +4,7 @@ class TodoService implements TodoRepo {
   final Dio _dio = DioClient.instance.dio;
 
   @override
-  Future<TodoModel> addTodo(TodoModel todoModel) async {
+  Future<TodoModel> createTodo(TodoModel todoModel) async {
     try {
       final response = await _dio.post(
         ApiConstants.todosEndpoint,

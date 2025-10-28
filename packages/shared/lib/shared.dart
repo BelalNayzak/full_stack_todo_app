@@ -5,4 +5,5 @@ export 'package:shared/src/models/todo_model.dart';
 export 'package:shared/src/models/user_model.dart';
 export 'package:shared/src/repos/todo_repo.dart';
 export 'package:shared/src/repos/user_repo.dart';
+export 'package:shared/src/repos/auth_repo.dart';
 export 'package:json_annotation/json_annotation.dart';

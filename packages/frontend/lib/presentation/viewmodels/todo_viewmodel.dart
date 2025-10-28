@@ -83,7 +83,7 @@ class TodoCubit extends Cubit<TodoState> {
         userIdFKey: userId,
       );
 
-      final response = await _todoService.addTodo(todoModel);
+      final response = await _todoService.createTodo(todoModel);
       final updatedTodos = [response, ...state.todos];
       emit(
         state.copyWith(

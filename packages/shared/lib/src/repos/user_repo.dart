@@ -1,9 +1,10 @@
-import 'package:shared/src/models/user_model.dart';
+import 'package:shared/shared.dart';
 
 abstract class UserRepo {
+  Future<UserModel> createUser(UserModel userModel);
   Future<List<UserModel>> getAllUsers();
-  Future<UserModel?> getUser(int id);
+  Future<UserModel?> getUserById(int id);
+  Future<UserModel?> getUserByEmail(String email);
+  Future<UserModel?> updateUser(UserModel updatedUserModel);
   Future<UserModel?> deleteUser(int id);
-  Future<UserModel> addUser(UserModel userModel);
-  Future<UserModel> updateUser(UserModel updatedUserModel);
 }

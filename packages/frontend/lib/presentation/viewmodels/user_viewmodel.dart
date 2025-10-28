@@ -43,7 +43,7 @@ class UserCubit extends Cubit<UserState> {
   UserCubit(this._userService) : super(const UserState());
 
   // Load all users
-  Future<void> loadUsers() async {
+  Future<void> loadAllUsers() async {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
@@ -68,12 +68,21 @@ class UserCubit extends Cubit<UserState> {
   }
 
   // Create a new user
-  Future<void> addUser({required String name, required String email}) async {
+  Future<void> createUser({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final userModel = UserModel(name: name, email: email, id: null);
-      final response = await _userService.addUser(userModel);
+      final userModel = UserModel(
+        name: name,
+        email: email,
+        password: password,
+        id: null,
+      );
+      final response = await _userService.createUser(userModel);
       final updatedUsers = [response, ...state.users];
       emit(
         state.copyWith(
@@ -99,12 +108,55 @@ class UserCubit extends Cubit<UserState> {
     emit(state.copyWith(selectedUser: user));
   }
 
-  // Get user by ID
-  UserModel? getUserById(int id) {
+  // get user by email
+  Future<void> getUserByEmail({required String email}) async {
+    emit(state.copyWith(isLoading: true, error: null));
+
     try {
-      return state.users.firstWhere((user) => user.id == id);
+      final response = await _userService.getUserByEmail(email);
+
+      emit(
+        state.copyWith(
+          users: [response!],
+          isLoading: false,
+          message: 'User loaded successfully.',
+        ),
+      );
     } catch (e) {
-      return null;
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: e is NetworkException
+              ? e.message
+              : 'An unexpected error occurred',
+        ),
+      );
+    }
+  }
+
+  // Get user by ID
+  Future<void> getUserById(int id) async {
+    emit(state.copyWith(isLoading: true, error: null));
+
+    try {
+      final response = await _userService.getUserById(id);
+
+      emit(
+        state.copyWith(
+          users: [response],
+          isLoading: false,
+          message: 'User loaded successfully.',
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: e is NetworkException
+              ? e.message
+              : 'An unexpected error occurred',
+        ),
+      );
     }
   }
 

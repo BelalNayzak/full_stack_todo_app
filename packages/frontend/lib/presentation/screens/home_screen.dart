@@ -14,7 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TodoCubit>().loadTodos();
-      context.read<UserCubit>().loadUsers();
+      // context.read<UserCubit>().loadUsers();
     });
   }
 

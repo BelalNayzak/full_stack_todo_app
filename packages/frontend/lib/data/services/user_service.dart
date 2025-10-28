@@ -25,7 +25,7 @@ class UserService implements UserRepo {
   }
 
   @override
-  Future<UserModel> getUser(int id) async {
+  Future<UserModel> getUserById(int id) async {
     try {
       final response = await _dio.get('${ApiConstants.usersEndpoint}/$id');
 
@@ -44,7 +44,26 @@ class UserService implements UserRepo {
   }
 
   @override
-  Future<UserModel> addUser(UserModel userModel) async {
+  Future<UserModel?> getUserByEmail(String email) async {
+    try {
+      final response = await _dio.get('${ApiConstants.usersEndpoint}/');
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        final user = UserModel.fromJson(data['data'] as Map<String, dynamic>);
+        return user;
+      } else {
+        throw GeneralException(message: 'Failed to fetch user');
+      }
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<UserModel> createUser(UserModel userModel) async {
     try {
       final response = await _dio.post(
         ApiConstants.usersEndpoint,

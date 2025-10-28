@@ -1,9 +1,9 @@
-import 'package:shared/src/models/todo_model.dart';
+import 'package:shared/shared.dart';
 
 abstract class TodoRepo {
+  Future<TodoModel> createTodo(TodoModel todoModel);
   Future<List<TodoModel>> getAllTodos();
   Future<TodoModel?> getTodo(int id);
+  Future<TodoModel?> updateTodo(TodoModel updatedTodoModel);
   Future<TodoModel?> deleteTodo(int id);
-  Future<TodoModel> addTodo(TodoModel todoModel);
-  Future<TodoModel> updateTodo(TodoModel updatedTodoModel);
 }

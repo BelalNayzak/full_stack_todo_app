@@ -11,11 +11,13 @@ class _AddUserDialogState extends State<AddUserDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -61,6 +63,25 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 return null;
               },
             ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.text,
+              obscureText: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a password';
+                }
+                if (!RegExp(r'^.{6,}$').hasMatch(value)) {
+                  return 'Please enter at least 6 chars';
+                }
+                return null;
+              },
+            ),
           ],
         ),
       ),
@@ -75,12 +96,13 @@ class _AddUserDialogState extends State<AddUserDialog> {
   }
 
   void _createUser() {
-    if (_formKey.currentState!.validate()) {
-      context.read<UserCubit>().addUser(
-        name: _nameController.text,
-        email: _emailController.text,
-      );
-      Navigator.of(context).pop();
-    }
+    // if (_formKey.currentState!.validate()) {
+    //   context.read<UserCubit>().createUser(
+    //     name: _nameController.text,
+    //     email: _emailController.text,
+    //     password: _passwordController.text,
+    //   );
+    //   Navigator.of(context).pop();
+    // }
   }
 }
