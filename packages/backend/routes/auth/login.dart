@@ -59,7 +59,7 @@ Future<Response> _onPost(RequestContext context) async {
   }
 
   // Login!
-  final String? token = await context.read<AuthRepo>().login(data.id!);
+  final String? token = await context.read<AuthRepo>().login(data);
 
   if (token == null) {
     return Response.json(
@@ -77,7 +77,7 @@ Future<Response> _onPost(RequestContext context) async {
     body: {
       'success': true,
       'message': 'Logged in successfully',
-      'token': token, // token (String)
+      'data': token, // token (String)
     },
   );
 }

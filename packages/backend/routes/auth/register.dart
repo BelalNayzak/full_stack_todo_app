@@ -48,7 +48,7 @@ Future<Response> _onPost(RequestContext context) async {
       body: {
         'success': true,
         'message': 'User registered successfully',
-        'user': data,
+        'data': data,
       },
     );
   } catch (e) {

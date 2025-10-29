@@ -15,7 +15,10 @@ Future<Response> onRequest(RequestContext context) async {
 
 // read todo
 Future<Response> _onGet(RequestContext context) async {
-  final data = await context.read<TodoRepo>().getAllTodos();
+  final reqBody = await context.request.json() as Map<String, dynamic>;
+  final userId = reqBody['user_id'];
+
+  final data = await context.read<TodoRepo>().getAllTodos(userId);
 
   return Response.json(
     body: {
@@ -50,7 +53,7 @@ Future<Response> _onPost(RequestContext context) async {
     body: {
       'success': true,
       'message': 'Todo created successfully',
-      'todo': data,
+      'data': data,
     },
   );
 }

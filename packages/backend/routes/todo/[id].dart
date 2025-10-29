@@ -88,7 +88,7 @@ Future<Response> _onPut(RequestContext context, String id) async {
     body: {
       'success': true,
       'message': 'Todo updated successfully',
-      'todo': data,
+      'data': data,
     },
   );
 }
@@ -125,7 +125,7 @@ Future<Response> _onDelete(RequestContext context, String id) async {
     body: {
       'success': true,
       'message': 'Todo deleted successfully',
-      'todo': data,
+      'data': data,
     },
   );
 }

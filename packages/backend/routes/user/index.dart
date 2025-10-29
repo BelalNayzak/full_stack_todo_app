@@ -15,15 +15,34 @@ Future<Response> onRequest(RequestContext context) async {
 
 // read user
 Future<Response> _onGet(RequestContext context) async {
-  final data = await context.read<UserRepo>().getAllUsers();
+  final reqBody = await context.request.json() as Map<String, dynamic>;
+  final token = reqBody['data'];
 
-  return Response.json(
-    body: {
-      "success": true,
-      "message": "All Users",
-      "data": data,
-    },
-  );
+  // getUserByToken
+  if (token != null) {
+    final data = await context.read<UserRepo>().getUserByToken(token);
+
+    return Response.json(
+      body: {
+        "success": true,
+        "message": "Loaded User by his token.",
+        "data": data,
+      },
+    );
+  }
+
+  // load all users
+  else {
+    final data = await context.read<UserRepo>().getAllUsers();
+
+    return Response.json(
+      body: {
+        "success": true,
+        "message": "All Users",
+        "data": data,
+      },
+    );
+  }
 }
 
 // create user
@@ -61,7 +80,7 @@ Future<Response> _onPost(RequestContext context) async {
       body: {
         'success': true,
         'message': 'User created successfully',
-        'user': data,
+        'data': data,
       },
     );
   } catch (e) {

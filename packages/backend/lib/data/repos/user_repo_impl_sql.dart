@@ -73,6 +73,13 @@ class UserRepoImplSQL implements UserRepo {
   }
 
   @override
+  Future<UserModel?> getUserByToken(String token) async {
+    final userId = TokenHelper.verifyToken(token);
+    final user = await getUserById(userId!);
+    return user;
+  }
+
+  @override
   Future<UserModel?> getUserByEmail(String email) async {
     final result = await connPool.execute(
       Sql.named('SELECT * FROM "user" WHERE "email"=@email'),

@@ -6,12 +6,6 @@ class AuthRepoImplSQL implements AuthRepo {
   AuthRepoImplSQL({required this.connPool});
 
   @override
-  Future<String?> login(int userId) async {
-    // just create and return the token here
-    return TokenHelper.generateToken(userId);
-  }
-
-  @override
   Future<UserModel> register(UserModel userModel) async {
     // excecute query
     final result = await connPool.execute(
@@ -29,5 +23,19 @@ class AuthRepoImplSQL implements AuthRepo {
         .toList();
 
     return data.first;
+  }
+
+  @override
+  Future<String?> login(UserModel userModel) async {
+    // just create and return the token here
+    return TokenHelper.generateToken(userModel.id!);
+  }
+
+  @override
+  Future<void> logout() async {
+    // JWT-based logout does not require server action
+    // Client should simply delete the token locally
+    // Note: for better experience, you can utilize a refresh token mechanism
+    return;
   }
 }

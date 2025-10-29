@@ -51,9 +51,12 @@ class TodoRepoImplSQL implements TodoRepo {
   }
 
   @override
-  Future<List<TodoModel>> getAllTodos() async {
-    final result =
-        await connPool.execute('SELECT * FROM "todo" ORDER BY "id" ASC'); // all
+  Future<List<TodoModel>> getAllTodos(int userId) async {
+    final result = await connPool.execute(
+      Sql.named(
+          'SELECT * FROM "todo" WHERE "user_id"=@user_id ORDER BY "id" ASC'),
+      parameters: {'user_id': userId},
+    ); // all user todos
 
     // data processing
     final data = result
