@@ -15,8 +15,23 @@ Future<Response> onRequest(RequestContext context) async {
 
 // read user
 Future<Response> _onGet(RequestContext context) async {
-  final reqBody = await context.request.json() as Map<String, dynamic>;
-  final token = reqBody['data'];
+  //! NOTE that on flutter mobile you use "dart.io" for handling http requests
+  //! "dart.io" allows GET to have a body (josn)
+  //! BUT on flutter web you use browser's "XMLHttpRequest" for handling http requests
+  //! "XMLHttpRequest" DON'T allow GET to have a body (josn)
+  //!
+  //! SO, If we want it to work on both mobile & web,
+  //! we use "queryParameters" instead of "json / body / data" (in case we're targetting web)
+  //!
+  //! Code Examples:
+  //! --------------
+  //! CORRECT!    final reqQueryParams = context.request.uri.queryParameters;
+  //! WRONG!      final reqBody = await context.request.json();
+  //! WRONG!      final reqBody = await context.request.body();
+
+  final reqQueryParams = context.request.uri.queryParameters;
+
+  final token = reqQueryParams['token'];
 
   // getUserByToken
   if (token != null) {
@@ -38,7 +53,7 @@ Future<Response> _onGet(RequestContext context) async {
     return Response.json(
       body: {
         "success": true,
-        "message": "All Users",
+        "message": "All Usersssss",
         "data": data,
       },
     );
