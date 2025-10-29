@@ -1,57 +1,14 @@
 import 'package:frontend_flutter/frontend.dart';
 
-class UserService implements UserRepo {
+class AuthService implements AuthRepo {
   final Dio _dio = DioClient.instance.dio;
 
   @override
-  Future<UserModel?> getUserByToken(String token) async {
+  Future<UserModel> register(UserModel userModel) async {
     try {
-      final response = await _dio.get(
-        '${ApiConstants.usersEndpoint}/',
-        data: {'token': token.substring('Bearer '.length)},
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-
-        final user = UserModel.fromJson(data['data']);
-
-        return user;
-      } else {
-        throw GeneralException(message: 'Failed to fetch user');
-      }
-    } on DioException catch (e) {
-      throw _handleDioException(e);
-    } catch (e) {
-      throw UnknownException(message: e.toString());
-    }
-  }
-
-  @override
-  Future<UserModel?> deleteUser(int id) async {
-    try {
-      final response = await _dio.delete('${ApiConstants.usersEndpoint}/$id');
-
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        final user = UserModel.fromJson(data['data'] as Map<String, dynamic>);
-        return user;
-      } else {
-        throw GeneralException(message: 'Failed to delete user');
-      }
-    } on DioException catch (e) {
-      throw _handleDioException(e);
-    } catch (e) {
-      throw UnknownException(message: e.toString());
-    }
-  }
-
-  @override
-  Future<UserModel> updateUser(UserModel updatedUserModel) async {
-    try {
-      final response = await _dio.put(
-        ApiConstants.usersEndpoint,
-        data: updatedUserModel.toJson(),
+      final response = await _dio.post(
+        ApiConstants.registerEndpoint,
+        data: userModel.toJson(),
       );
 
       if (response.statusCode == 200) {
@@ -59,7 +16,7 @@ class UserService implements UserRepo {
         final user = UserModel.fromJson(data['data'] as Map<String, dynamic>);
         return user;
       } else {
-        throw GeneralException(message: 'Failed to update user');
+        throw GeneralException(message: 'Failed to register.');
       }
     } on DioException catch (e) {
       throw _handleDioException(e);
@@ -69,23 +26,41 @@ class UserService implements UserRepo {
   }
 
   @override
-  Future<List<UserModel>> getAllUsers() async {
-    throw UnimplementedError(); // just used for backend
+  Future<String?> login(UserModel userModel) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.loginEndpoint,
+        data: userModel.toJson(),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        final String token = data['data'];
+        return token;
+      } else {
+        throw GeneralException(message: 'Login Failed.');
+      }
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
   }
 
   @override
-  Future<UserModel> createUser(UserModel userModel) async {
-    throw UnimplementedError(); // just used for backend
-  }
-
-  @override
-  Future<UserModel> getUserById(int id) async {
-    throw UnimplementedError(); // just used for backend
-  }
-
-  @override
-  Future<UserModel?> getUserByEmail(String email) async {
-    throw UnimplementedError(); // just used for backend
+  Future<void> logout() async {
+    try {
+      final response = await _dio.post(ApiConstants.logoutEndpoint);
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw GeneralException(message: 'Logout Failed.');
+      }
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
   }
 
   ///

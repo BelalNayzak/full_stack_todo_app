@@ -14,6 +14,7 @@ class TodoApp extends StatelessWidget {
       providers: [
         BlocProvider<TodoCubit>(create: (context) => TodoCubit(TodoService())),
         BlocProvider<UserCubit>(create: (context) => UserCubit(UserService())),
+        BlocProvider<AuthCubit>(create: (context) => AuthCubit(AuthService())),
       ],
       child: RequestsInspector(
         navigatorKey: navigatorKey,
@@ -36,7 +37,7 @@ class TodoApp extends StatelessWidget {
               elevation: 4,
             ),
           ),
-          home: const HomeScreen(),
+          home: const LoginScreen(),
         ),
       ),
     );

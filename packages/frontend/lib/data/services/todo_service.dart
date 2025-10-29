@@ -13,7 +13,7 @@ class TodoService implements TodoRepo {
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
-        final todo = TodoModel.fromJson(data['todo'] as Map<String, dynamic>);
+        final todo = TodoModel.fromJson(data['data'] as Map<String, dynamic>);
         return todo;
       } else {
         throw GeneralException(message: 'Failed to create todo');
@@ -32,7 +32,7 @@ class TodoService implements TodoRepo {
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
-        final todo = TodoModel.fromJson(data['todo'] as Map<String, dynamic>);
+        final todo = TodoModel.fromJson(data['data'] as Map<String, dynamic>);
         return todo;
       } else {
         throw GeneralException(message: 'Failed to delete todo');
@@ -45,9 +45,12 @@ class TodoService implements TodoRepo {
   }
 
   @override
-  Future<List<TodoModel>> getAllTodos() async {
+  Future<List<TodoModel>> getAllTodos(int userId) async {
     try {
-      final response = await _dio.get(ApiConstants.todosEndpoint);
+      final response = await _dio.get(
+        ApiConstants.todosEndpoint,
+        data: {'user_id': userId},
+      );
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;

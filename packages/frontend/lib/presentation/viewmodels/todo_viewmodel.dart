@@ -39,11 +39,11 @@ class TodoCubit extends Cubit<TodoState> {
   TodoCubit(this._todoService) : super(const TodoState());
 
   // Load all todos
-  Future<void> loadTodos() async {
+  Future<void> loadAllTodos(int userId) async {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final response = await _todoService.getAllTodos();
+      final response = await _todoService.getAllTodos(userId);
       emit(
         state.copyWith(
           todos: response,

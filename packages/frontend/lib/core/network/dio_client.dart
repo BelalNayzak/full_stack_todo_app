@@ -26,5 +26,10 @@ class DioClient {
     return _instance!;
   }
 
+  /// update headers with token
+  void updateTokenInHeaders(String token) {
+    _dio.options.headers['Authorization'] = 'Bearer $token';
+  }
+
   Dio get dio => _dio;
 }

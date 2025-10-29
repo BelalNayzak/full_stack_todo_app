@@ -33,7 +33,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (userState.selectedUser == null)
+                if (userState.user == null)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
@@ -134,7 +134,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                     ),
                   ],
                 ),
-                if (userState.selectedUser != null)
+                if (userState.user != null)
                   Container(
                     width: double.infinity,
                     margin: const EdgeInsets.only(top: 16),
@@ -150,7 +150,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'User: ${userState.selectedUser!.name}',
+                            'User: ${userState.user!.name}',
                             style: const TextStyle(color: Colors.blue),
                           ),
                         ),
@@ -166,7 +166,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: userState.selectedUser == null ? null : _createTodo,
+              onPressed: userState.user == null ? null : _createTodo,
               child: const Text('Create'),
             ),
           ],
@@ -178,13 +178,13 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
   void _createTodo() {
     if (_formKey.currentState!.validate()) {
       final userState = context.read<UserCubit>().state;
-      if (userState.selectedUser != null) {
+      if (userState.user != null) {
         context.read<TodoCubit>().createTodo(
           title: _titleController.text,
           desc: _descController.text,
           priority: _selectedPriority,
           status: _selectedStatus,
-          userId: userState.selectedUser!.id!,
+          userId: userState.user!.id!,
         );
         Navigator.of(context).pop();
       }
