@@ -1,35 +1,54 @@
 import 'package:frontend_flutter/frontend.dart';
 
+enum TodoFilter { all, todo, inProgress, done }
+
 // State classes for different UI states
 class TodoState extends Equatable {
   final List<TodoModel> todos;
   final bool isLoading;
   final String? error;
   final String? message;
+  final TodoFilter filter;
 
   const TodoState({
     this.todos = const [],
     this.isLoading = false,
     this.error,
     this.message,
+    this.filter = TodoFilter.all,
   });
+
+  List<TodoModel> get visibleTodos {
+    switch (filter) {
+      case TodoFilter.todo:
+        return todos.where((t) => t.status == TodoStatus.todo).toList();
+      case TodoFilter.inProgress:
+        return todos.where((t) => t.status == TodoStatus.inProgress).toList();
+      case TodoFilter.done:
+        return todos.where((t) => t.status == TodoStatus.done).toList();
+      case TodoFilter.all:
+        return todos;
+    }
+  }
 
   TodoState copyWith({
     List<TodoModel>? todos,
     bool? isLoading,
     String? error,
     String? message,
+    TodoFilter? filter,
   }) {
     return TodoState(
       todos: todos ?? this.todos,
       isLoading: isLoading ?? this.isLoading,
       error: error,
       message: message,
+      filter: filter ?? this.filter,
     );
   }
 
   @override
-  List<Object?> get props => [todos, isLoading, error, message];
+  List<Object?> get props => [todos, isLoading, error, message, filter];
 }
 
 // TodoCubit class
@@ -37,6 +56,8 @@ class TodoCubit extends Cubit<TodoState> {
   final TodoService _todoService;
 
   TodoCubit(this._todoService) : super(const TodoState());
+
+  void setFilter(TodoFilter filter) => emit(state.copyWith(filter: filter));
 
   // Load all todos
   Future<void> loadAllTodos(int userId) async {

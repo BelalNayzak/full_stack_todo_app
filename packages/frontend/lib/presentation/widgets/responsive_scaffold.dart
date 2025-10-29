@@ -1,4 +1,3 @@
-import 'package:frontend_flutter/core/responsive/breakpoints.dart';
 import 'package:frontend_flutter/frontend.dart';
 
 class ResponsiveScaffold extends StatelessWidget {
@@ -21,7 +20,7 @@ class ResponsiveScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.isDesktop) {
+    if (context.isDesktop && sidebar != null) {
       return Row(
         children: [
           SizedBox(
@@ -29,7 +28,7 @@ class ResponsiveScaffold extends StatelessWidget {
             child: Material(
               color: Theme.of(context).colorScheme.surface,
               elevation: 0,
-              child: sidebar ?? const SizedBox.shrink(),
+              child: sidebar,
             ),
           ),
           const VerticalDivider(width: 1),
@@ -44,7 +43,7 @@ class ResponsiveScaffold extends StatelessWidget {
       );
     }
 
-    // Tablet/Mobile
+    // Tablet/Mobile or no sidebar provided
     return Scaffold(
       appBar: appBar,
       body: body,

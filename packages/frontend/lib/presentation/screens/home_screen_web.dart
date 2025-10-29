@@ -12,6 +12,7 @@ class HomeScreenWeb extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: BlocBuilder<TodoCubit, TodoState>(
           builder: (context, state) {
+            final todos = state.visibleTodos;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -21,11 +22,42 @@ class HomeScreenWeb extends StatelessWidget {
                 if (state.message != null)
                   _Banner(message: state.message!, isError: false),
                 const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    FilterChip(
+                      label: const Text('All'),
+                      selected: state.filter == TodoFilter.all,
+                      onSelected: (_) =>
+                          context.read<TodoCubit>().setFilter(TodoFilter.all),
+                    ),
+                    FilterChip(
+                      label: const Text('Todo'),
+                      selected: state.filter == TodoFilter.todo,
+                      onSelected: (_) =>
+                          context.read<TodoCubit>().setFilter(TodoFilter.todo),
+                    ),
+                    FilterChip(
+                      label: const Text('In Progress'),
+                      selected: state.filter == TodoFilter.inProgress,
+                      onSelected: (_) => context.read<TodoCubit>().setFilter(
+                        TodoFilter.inProgress,
+                      ),
+                    ),
+                    FilterChip(
+                      label: const Text('Done'),
+                      selected: state.filter == TodoFilter.done,
+                      onSelected: (_) =>
+                          context.read<TodoCubit>().setFilter(TodoFilter.done),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final isGrid = constraints.maxWidth >= 900;
-                      if (state.todos.isEmpty && !state.isLoading) {
+                      if (todos.isEmpty && !state.isLoading) {
                         return const _EmptyState();
                       }
                       if (isGrid) {
@@ -40,16 +72,14 @@ class HomeScreenWeb extends StatelessWidget {
                                 crossAxisSpacing: 16,
                                 childAspectRatio: 4 / 2,
                               ),
-                          itemCount: state.todos.length,
-                          itemBuilder: (_, i) =>
-                              TodoItemWidget(todo: state.todos[i]),
+                          itemCount: todos.length,
+                          itemBuilder: (_, i) => TodoItemWidget(todo: todos[i]),
                         );
                       }
                       return ListView.separated(
-                        itemCount: state.todos.length,
+                        itemCount: todos.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
-                        itemBuilder: (_, i) =>
-                            TodoItemWidget(todo: state.todos[i]),
+                        itemBuilder: (_, i) => TodoItemWidget(todo: todos[i]),
                       );
                     },
                   ),
@@ -72,6 +102,7 @@ class _Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final state = context.watch<TodoCubit>().state;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -88,17 +119,27 @@ class _Sidebar extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.list_alt_outlined),
             title: const Text('All Todos'),
-            onTap: () {},
+            selected: state.filter == TodoFilter.all,
+            onTap: () => context.read<TodoCubit>().setFilter(TodoFilter.all),
           ),
           ListTile(
             leading: const Icon(Icons.playlist_add_check_circle_outlined),
+            title: const Text('Todo'),
+            selected: state.filter == TodoFilter.todo,
+            onTap: () => context.read<TodoCubit>().setFilter(TodoFilter.todo),
+          ),
+          ListTile(
+            leading: const Icon(Icons.alarm),
             title: const Text('In Progress'),
-            onTap: () {},
+            selected: state.filter == TodoFilter.inProgress,
+            onTap: () =>
+                context.read<TodoCubit>().setFilter(TodoFilter.inProgress),
           ),
           ListTile(
             leading: const Icon(Icons.done_all_outlined),
             title: const Text('Completed'),
-            onTap: () {},
+            selected: state.filter == TodoFilter.done,
+            onTap: () => context.read<TodoCubit>().setFilter(TodoFilter.done),
           ),
           const Spacer(),
           OutlinedButton.icon(
