@@ -23,20 +23,7 @@ class TodoApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Todo App - Full Stack',
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-            appBarTheme: const AppBarTheme(centerTitle: true, elevation: 2),
-            cardTheme: CardThemeData(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            floatingActionButtonTheme: const FloatingActionButtonThemeData(
-              elevation: 4,
-            ),
-          ),
+          theme: AppTheme.theme(),
           home: const LoginScreen(),
         ),
       ),

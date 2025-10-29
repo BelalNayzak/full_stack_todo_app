@@ -33,29 +33,6 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (userState.user == null)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange.shade300),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.warning, color: Colors.orange),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Please select a user first',
-                            style: TextStyle(color: Colors.orange),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(
@@ -166,8 +143,8 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: userState.user == null ? null : _createTodo,
-              child: const Text('Create'),
+              onPressed: _createTodo,
+              child: const Text('Create Todo'),
             ),
           ],
         );

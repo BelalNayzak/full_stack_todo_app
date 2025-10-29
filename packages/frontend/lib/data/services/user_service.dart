@@ -8,7 +8,7 @@ class UserService implements UserRepo {
     try {
       final response = await _dio.get(
         '${ApiConstants.usersEndpoint}/',
-        data: {'token': token.substring('Bearer '.length)},
+        queryParameters: {'token': token.substring('Bearer '.length)},
       );
 
       if (response.statusCode == 200) {

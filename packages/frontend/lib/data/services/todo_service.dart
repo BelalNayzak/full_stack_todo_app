@@ -49,7 +49,7 @@ class TodoService implements TodoRepo {
     try {
       final response = await _dio.get(
         ApiConstants.todosEndpoint,
-        data: {'user_id': userId},
+        queryParameters: {'user_id': userId},
       );
 
       if (response.statusCode == 200) {

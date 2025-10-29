@@ -25,13 +25,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (context.isDesktop) return const HomeScreenWeb();
+
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.message != null && state.error == null) {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.message!)));
-
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const LoginScreen()),
             (route) => false,
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Todo App'),
               backgroundColor: Theme.of(context).colorScheme.inversePrimary,
               actions: [
-                // Add User Button
+                // Logout Button
                 IconButton(
                   onPressed: () => _showLogoutConfirmation(context),
                   icon: const Icon(Icons.logout),
@@ -169,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Logout'),
-        content: Text('Are you sure you want to logout?'),
+        content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
