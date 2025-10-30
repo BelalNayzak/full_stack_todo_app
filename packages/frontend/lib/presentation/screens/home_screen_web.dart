@@ -5,129 +5,136 @@ class HomeScreenWeb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveScaffold(
-      appBar: FancyAppBar(
-        title:
-            'Welcome back, ${context.read<UserCubit>().state.user?.name ?? ''}! 👋',
-      ),
-      sidebar: _Sidebar(),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: BlocListener<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state.message != null && state.error == null) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.message!)));
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
-              );
-            }
-          },
-          child: BlocBuilder<TodoCubit, TodoState>(
-            builder: (context, state) {
-              if (state.isLoading) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    SkeletonBox(height: 24, width: 240),
-                    SizedBox(height: 12),
-                    Expanded(child: SkeletonGrid()),
-                  ],
-                );
-              }
+    return BlocBuilder<UserCubit, UserState>(
+      builder: (context, state) {
+        return ResponsiveScaffold(
+          appBar: FancyAppBar(
+            title:
+                'Welcome back, ${context.read<UserCubit>().state.user?.name ?? ''}! 👋',
+          ),
+          sidebar: _Sidebar(),
+          body: Padding(
+            padding: const EdgeInsets.all(24),
+            child: BlocListener<AuthCubit, AuthState>(
+              listener: (context, state) {
+                if (state.message != null && state.error == null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.message!)));
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              },
+              child: BlocBuilder<TodoCubit, TodoState>(
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        SkeletonBox(height: 24, width: 240),
+                        SizedBox(height: 12),
+                        Expanded(child: SkeletonGrid()),
+                      ],
+                    );
+                  }
 
-              final todos = state.visibleTodos;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (state.error != null)
-                    _Banner(message: state.error!, isError: true),
-                  if (state.message != null)
-                    _Banner(message: state.message!, isError: false),
-                  const SizedBox(height: 12),
-                  Row(
+                  final todos = state.visibleTodos;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Wrap(
-                        spacing: 8,
+                      if (state.error != null)
+                        _Banner(message: state.error!, isError: true),
+                      if (state.message != null)
+                        _Banner(message: state.message!, isError: false),
+                      const SizedBox(height: 12),
+                      Row(
                         children: [
-                          FilterChip(
-                            label: const Text('All'),
-                            selected: state.filter == TodoFilter.all,
-                            onSelected: (_) => context
-                                .read<TodoCubit>()
-                                .setFilter(TodoFilter.all),
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              FilterChip(
+                                label: const Text('All'),
+                                selected: state.filter == TodoFilter.all,
+                                onSelected: (_) => context
+                                    .read<TodoCubit>()
+                                    .setFilter(TodoFilter.all),
+                              ),
+                              FilterChip(
+                                label: const Text('Todo'),
+                                selected: state.filter == TodoFilter.todo,
+                                onSelected: (_) => context
+                                    .read<TodoCubit>()
+                                    .setFilter(TodoFilter.todo),
+                              ),
+                              FilterChip(
+                                label: const Text('In Progress'),
+                                selected: state.filter == TodoFilter.inProgress,
+                                onSelected: (_) => context
+                                    .read<TodoCubit>()
+                                    .setFilter(TodoFilter.inProgress),
+                              ),
+                              FilterChip(
+                                label: const Text('Done'),
+                                selected: state.filter == TodoFilter.done,
+                                onSelected: (_) => context
+                                    .read<TodoCubit>()
+                                    .setFilter(TodoFilter.done),
+                              ),
+                            ],
                           ),
-                          FilterChip(
-                            label: const Text('Todo'),
-                            selected: state.filter == TodoFilter.todo,
-                            onSelected: (_) => context
-                                .read<TodoCubit>()
-                                .setFilter(TodoFilter.todo),
-                          ),
-                          FilterChip(
-                            label: const Text('In Progress'),
-                            selected: state.filter == TodoFilter.inProgress,
-                            onSelected: (_) => context
-                                .read<TodoCubit>()
-                                .setFilter(TodoFilter.inProgress),
-                          ),
-                          FilterChip(
-                            label: const Text('Done'),
-                            selected: state.filter == TodoFilter.done,
-                            onSelected: (_) => context
-                                .read<TodoCubit>()
-                                .setFilter(TodoFilter.done),
+                          const Spacer(),
+                          Tooltip(
+                            message: 'Switch view',
+                            child: SegmentedButton<ViewMode>(
+                              segments: const [
+                                ButtonSegment(
+                                  value: ViewMode.list,
+                                  icon: Icon(Icons.view_agenda_outlined),
+                                  label: Text('List'),
+                                ),
+                                ButtonSegment(
+                                  value: ViewMode.grid,
+                                  icon: Icon(Icons.dashboard_outlined),
+                                  label: Text('Grid'),
+                                ),
+                                ButtonSegment(
+                                  value: ViewMode.board,
+                                  icon: Icon(Icons.view_kanban_outlined),
+                                  label: Text('Board'),
+                                ),
+                              ],
+                              selected: {state.viewMode},
+                              onSelectionChanged: (set) => context
+                                  .read<TodoCubit>()
+                                  .setViewMode(set.first),
+                            ),
                           ),
                         ],
                       ),
-                      const Spacer(),
-                      Tooltip(
-                        message: 'Switch view',
-                        child: SegmentedButton<ViewMode>(
-                          segments: const [
-                            ButtonSegment(
-                              value: ViewMode.list,
-                              icon: Icon(Icons.view_agenda_outlined),
-                              label: Text('List'),
-                            ),
-                            ButtonSegment(
-                              value: ViewMode.grid,
-                              icon: Icon(Icons.dashboard_outlined),
-                              label: Text('Grid'),
-                            ),
-                            ButtonSegment(
-                              value: ViewMode.board,
-                              icon: Icon(Icons.view_kanban_outlined),
-                              label: Text('Board'),
-                            ),
-                          ],
-                          selected: {state.viewMode},
-                          onSelectionChanged: (set) =>
-                              context.read<TodoCubit>().setViewMode(set.first),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: _buildBodyForMode(state, todos),
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: _buildBodyForMode(state, todos),
-                    ),
-                  ),
-                ],
-              );
-            },
+                  );
+                },
+              ),
+            ),
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            showDialog(context: context, builder: (_) => const AddTodoDialog()),
-        child: const Icon(Icons.add),
-      ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => const AddTodoDialog(),
+            ),
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 
@@ -207,7 +214,11 @@ class _Sidebar extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(radius: 16, backgroundColor: scheme.primary),
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: scheme.primary,
+                backgroundImage: AssetImage('assets/images/belal.jpeg'),
+              ),
               const SizedBox(width: 8),
               Text('Tasks', style: Theme.of(context).textTheme.titleMedium),
             ],
