@@ -1,5 +1,6 @@
 import 'package:frontend_flutter/frontend.dart';
 
+
 class TodoItemWidget extends StatelessWidget {
   final TodoModel todo;
 
@@ -7,74 +8,96 @@ class TodoItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _getPriorityColor(todo.priority),
-          child: Text(
-            _getPriorityIcon(todo.priority),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Text(
-          '${todo.title}',
-          style: TextStyle(
-            decoration: todo.status == TodoStatus.done
-                ? TextDecoration.lineThrough
-                : null,
-            color: todo.status == TodoStatus.done ? Colors.grey : null,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${todo.desc}'),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                _buildStatusChip(todo.status),
-                const SizedBox(width: 8),
-                _buildPriorityChip(todo.priority),
-              ],
-            ),
-          ],
-        ),
-        trailing: PopupMenuButton<String>(
-          onSelected: (value) => _handleMenuAction(context, value),
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'toggle',
-              child: Row(
-                children: [
-                  Icon(Icons.toggle_on),
-                  SizedBox(width: 8),
-                  Text('Toggle Status'),
+    final textTheme = Theme.of(context).textTheme;
+
+    return ElevatedHoverCard(
+      onTap: () => _handleMenuAction(context, 'toggle'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: _getPriorityColor(todo.priority),
+                child: Text(
+                  _getPriorityIcon(todo.priority),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${todo.title}',
+                      style: textTheme.titleMedium?.copyWith(
+                        decoration: todo.status == TodoStatus.done
+                            ? TextDecoration.lineThrough
+                            : null,
+                        color: todo.status == TodoStatus.done
+                            ? Colors.grey
+                            : null,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('${todo.desc}', style: textTheme.bodySmall),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        _buildStatusChip(todo.status),
+                        _buildPriorityChip(todo.priority),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) => _handleMenuAction(context, value),
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: 'toggle',
+                    child: Row(
+                      children: [
+                        Icon(Icons.toggle_on),
+                        SizedBox(width: 8),
+                        Text('Toggle Status'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit),
+                        SizedBox(width: 8),
+                        Text('Edit'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Delete', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-            const PopupMenuItem(
-              value: 'edit',
-              child: Row(
-                children: [Icon(Icons.edit), SizedBox(width: 8), Text('Edit')],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
-                ],
-              ),
-            ),
-          ],
-        ),
-        onTap: () => _handleMenuAction(context, 'toggle'),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -240,15 +263,15 @@ class TodoItemWidget extends StatelessWidget {
                       labelText: 'Priority',
                       border: OutlineInputBorder(),
                     ),
-                    items: TodoPriority.values.map((priority) {
-                      return DropdownMenuItem(
-                        value: priority,
-                        child: Text(priority.name.toUpperCase()),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) selectedPriority = value;
-                    },
+                    items: TodoPriority.values
+                        .map(
+                          (priority) => DropdownMenuItem(
+                            value: priority,
+                            child: Text(priority.name.toUpperCase()),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) => selectedPriority = value,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -259,15 +282,15 @@ class TodoItemWidget extends StatelessWidget {
                       labelText: 'Status',
                       border: OutlineInputBorder(),
                     ),
-                    items: TodoStatus.values.map((status) {
-                      return DropdownMenuItem(
-                        value: status,
-                        child: Text(status.name.toUpperCase()),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) selectedStatus = value;
-                    },
+                    items: TodoStatus.values
+                        .map(
+                          (status) => DropdownMenuItem(
+                            value: status,
+                            child: Text(status.name.toUpperCase()),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) => selectedStatus = value,
                   ),
                 ),
               ],

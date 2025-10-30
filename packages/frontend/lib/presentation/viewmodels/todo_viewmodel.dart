@@ -2,6 +2,8 @@ import 'package:frontend_flutter/frontend.dart';
 
 enum TodoFilter { all, todo, inProgress, done }
 
+enum ViewMode { list, grid, board }
+
 // State classes for different UI states
 class TodoState extends Equatable {
   final List<TodoModel> todos;
@@ -9,6 +11,7 @@ class TodoState extends Equatable {
   final String? error;
   final String? message;
   final TodoFilter filter;
+  final ViewMode viewMode;
 
   const TodoState({
     this.todos = const [],
@@ -16,6 +19,7 @@ class TodoState extends Equatable {
     this.error,
     this.message,
     this.filter = TodoFilter.all,
+    this.viewMode = ViewMode.board,
   });
 
   List<TodoModel> get visibleTodos {
@@ -37,6 +41,7 @@ class TodoState extends Equatable {
     String? error,
     String? message,
     TodoFilter? filter,
+    ViewMode? viewMode,
   }) {
     return TodoState(
       todos: todos ?? this.todos,
@@ -44,11 +49,19 @@ class TodoState extends Equatable {
       error: error,
       message: message,
       filter: filter ?? this.filter,
+      viewMode: viewMode ?? this.viewMode,
     );
   }
 
   @override
-  List<Object?> get props => [todos, isLoading, error, message, filter];
+  List<Object?> get props => [
+    todos,
+    isLoading,
+    error,
+    message,
+    filter,
+    viewMode,
+  ];
 }
 
 // TodoCubit class
@@ -58,6 +71,7 @@ class TodoCubit extends Cubit<TodoState> {
   TodoCubit(this._todoService) : super(const TodoState());
 
   void setFilter(TodoFilter filter) => emit(state.copyWith(filter: filter));
+  void setViewMode(ViewMode mode) => emit(state.copyWith(viewMode: mode));
 
   // Load all todos
   Future<void> loadAllTodos(int userId) async {

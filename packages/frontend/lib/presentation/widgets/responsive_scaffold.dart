@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/foundation.dart';
 import 'package:frontend_flutter/frontend.dart';
 
 class ResponsiveScaffold extends StatelessWidget {
@@ -20,18 +23,40 @@ class ResponsiveScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.isDesktop && sidebar != null) {
+    final isDesktop =
+        MediaQuery.sizeOf(context).width >= 1200 ||
+        kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktop && sidebar != null) {
       return Row(
         children: [
           SizedBox(
             width: 280,
-            child: Material(
-              color: Theme.of(context).colorScheme.surface,
-              elevation: 0,
-              child: sidebar,
+            child: ClipRRect(
+              borderRadius: BorderRadius.zero,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: 0.6),
+                    border: Border(
+                      right: BorderSide(
+                        color: Theme.of(
+                          context,
+                        ).dividerColor.withValues(alpha: 0.3),
+                      ),
+                    ),
+                  ),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: sidebar,
+                  ),
+                ),
+              ),
             ),
           ),
-          const VerticalDivider(width: 1),
           Expanded(
             child: Scaffold(
               appBar: appBar,

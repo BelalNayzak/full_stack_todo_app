@@ -40,13 +40,26 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       child: BlocBuilder<TodoCubit, TodoState>(
-        builder: (context, todoState) {
+        builder: (context, state) {
+          final todos = state.visibleTodos;
           return Scaffold(
-            appBar: AppBar(
-              title: const Text('Todo App'),
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            appBar: FancyAppBar(
+              title:
+                  'Welcome back, ${context.read<UserCubit>().state.user?.name ?? ''}! 👋',
               actions: [
-                // Logout Button
+                IconButton(
+                  tooltip: state.viewMode == ViewMode.list ? 'Grid' : 'List',
+                  onPressed: () => context.read<TodoCubit>().setViewMode(
+                    state.viewMode == ViewMode.list
+                        ? ViewMode.grid
+                        : ViewMode.list,
+                  ),
+                  icon: Icon(
+                    state.viewMode == ViewMode.list
+                        ? Icons.grid_view_rounded
+                        : Icons.view_agenda_rounded,
+                  ),
+                ),
                 IconButton(
                   onPressed: () => _showLogoutConfirmation(context),
                   icon: const Icon(Icons.logout),
@@ -55,9 +68,48 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             body: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Error and Success Messages
-                if (todoState.error != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      FilterChip(
+                        label: const Text('All'),
+                        selected: state.filter == TodoFilter.all,
+                        onSelected: (_) =>
+                            context.read<TodoCubit>().setFilter(TodoFilter.all),
+                      ),
+                      FilterChip(
+                        label: const Text('Todo'),
+                        selected: state.filter == TodoFilter.todo,
+                        onSelected: (_) => context.read<TodoCubit>().setFilter(
+                          TodoFilter.todo,
+                        ),
+                      ),
+                      FilterChip(
+                        label: const Text('In Progress'),
+                        selected: state.filter == TodoFilter.inProgress,
+                        onSelected: (_) => context.read<TodoCubit>().setFilter(
+                          TodoFilter.inProgress,
+                        ),
+                      ),
+                      FilterChip(
+                        label: const Text('Done'),
+                        selected: state.filter == TodoFilter.done,
+                        onSelected: (_) => context.read<TodoCubit>().setFilter(
+                          TodoFilter.done,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                if (state.error != null)
                   Container(
                     width: double.infinity,
                     margin: const EdgeInsets.all(8),
@@ -73,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            todoState.error!,
+                            state.error!,
                             style: TextStyle(color: Colors.red.shade700),
                           ),
                         ),
@@ -86,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                if (todoState.message != null)
+                if (state.message != null)
                   Container(
                     width: double.infinity,
                     margin: const EdgeInsets.all(8),
@@ -102,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            todoState.message!,
+                            state.message!,
                             style: TextStyle(color: Colors.green.shade700),
                           ),
                         ),
@@ -115,38 +167,37 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                // Loading Indicator
-                if (todoState.isLoading) const LinearProgressIndicator(),
+                if (state.isLoading) const LinearProgressIndicator(),
 
-                // Todo List
                 Expanded(
-                  child: todoState.todos.isEmpty && !todoState.isLoading
-                      ? const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.task_alt,
-                                size: 64,
-                                color: Colors.grey,
+                  child: Builder(
+                    builder: (_) {
+                      if (todos.isEmpty && !state.isLoading) {
+                        return const Center(child: Text('No todos yet'));
+                      }
+                      if (state.viewMode == ViewMode.grid) {
+                        return GridView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 12,
+                                crossAxisSpacing: 12,
+                                childAspectRatio:
+                                    3 / 3, // Increased height for mobile
                               ),
-                              SizedBox(height: 16),
-                              Text(
-                                'No todos yet',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Tap the + button to add your first todo',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        )
-                      : const TodoListWidget(),
+                          itemCount: todos.length,
+                          itemBuilder: (_, i) => TodoItemWidget(todo: todos[i]),
+                        );
+                      }
+                      return ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        itemCount: todos.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (_, i) => TodoItemWidget(todo: todos[i]),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
