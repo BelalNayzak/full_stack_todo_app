@@ -1,1 +1,1 @@
-deploy_from: backend
+deploy_from: build
