@@ -13,6 +13,12 @@ WORKDIR /app/packages/backend
 # Get dependencies
 RUN dart pub get
 
+# Install dart_frog_cli globally
+RUN dart pub global activate dart_frog_cli
+
+# Add pub global executables to PATH
+ENV PATH="$PATH:/root/.pub-cache/bin"
+
 # Build the Dart Frog production files
 RUN dart_frog build
 
