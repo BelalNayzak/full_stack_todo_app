@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 
 
+import '../routes/index.dart' as index;
 import '../routes/user/index.dart' as user_index;
 import '../routes/user/[id].dart' as user_$id;
 import '../routes/todo/index.dart' as todo_index;
@@ -37,7 +38,8 @@ Handler buildRootHandler() {
   final router = Router()
     ..mount('/auth', (context) => buildAuthHandler()(context))
     ..mount('/todo', (context) => buildTodoHandler()(context))
-    ..mount('/user', (context) => buildUserHandler()(context));
+    ..mount('/user', (context) => buildUserHandler()(context))
+    ..mount('/', (context) => buildHandler()(context));
   return pipeline.addHandler(router);
 }
 
@@ -59,6 +61,13 @@ Handler buildUserHandler() {
   final pipeline = const Pipeline().addMiddleware(user_middleware.middleware);
   final router = Router()
     ..all('/', (context) => user_index.onRequest(context,))..all('/<id>', (context,id,) => user_$id.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildHandler() {
+  final pipeline = const Pipeline();
+  final router = Router()
+    ..all('/', (context) => index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
