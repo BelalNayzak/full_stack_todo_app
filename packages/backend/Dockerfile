@@ -2,11 +2,11 @@
     FROM dart:stable AS build
 
     WORKDIR /app
-    COPY . .
-    
+    COPY ../../packages ./packages
+    WORKDIR /app/packages/backend
     # Get dependencies
     RUN dart pub get
-    
+        
     # Build Dart Frog production files
     RUN dart_frog build
     
