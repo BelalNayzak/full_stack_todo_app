@@ -18,7 +18,7 @@ class EnvConfigs {
   static String get dbUserName => getEnv('SUPABASE_USER', fallback: 'postgres');
   static String get dbPassword => getEnv('SUPABASE_PASS', fallback: '');
   static int get dbPort =>
-      int.tryParse(getEnv('PORT', fallback: '5432')) ?? 5432;
+      int.tryParse(getEnv('SUPABASE_PORT', fallback: '5432')) ?? 5432;
   static int get dbMaxConnCount =>
       int.tryParse(getEnv('DB_MAX_CONN_COUNT', fallback: '10')) ?? 10;
 
