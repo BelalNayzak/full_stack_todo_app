@@ -13,7 +13,8 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Shared package
-  shared: 1.0.0 # the shared code (pkg)
+  shared:
+    path: ../shared # the shared code (pkg)
 
   # Network
   dio: ^5.9.0

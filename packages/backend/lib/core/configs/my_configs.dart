@@ -13,12 +13,12 @@ final connectionPool = Pool.withEndpoints(
       database: EnvConfigs.dbName,
       username: EnvConfigs.dbUserName,
       password: EnvConfigs.dbPassword,
-      port: EnvConfigs.dbPort,
+      port: EnvConfigs.isProduction ? EnvConfigs.dbPort : 5432,
     ),
   ],
   settings: PoolSettings(
-    // 👈 disable SSL for local use ONLY !
-    sslMode: SslMode.disable,
+    // disable SSL for local use ONLY but enable it for production!
+    sslMode: EnvConfigs.isProduction ? SslMode.require : SslMode.disable,
     // up to 10 concurrent connections
     maxConnectionCount: EnvConfigs.dbMaxConnCount,
   ),
@@ -31,14 +31,16 @@ class EnvConfigs {
   const EnvConfigs._();
 
   static String get tokenSecret => getEnv('TOKEN_SECRET');
-
-  static String get dbHost => getEnv('DB_HOST', fallback: 'localhost');
+  static String get dbHost => Platform.environment['DB_HOST'] ?? 'localhost';
+  static String get dbName => Platform.environment['DB_NAME'] ?? 'postgres';
+  static String get dbUserName =>
+      Platform.environment['DB_USERNAME'] ?? 'postgres';
+  static String get dbPassword => Platform.environment['DB_PASSWORD'] ?? '';
   static int get dbPort =>
-      int.tryParse(getEnv('DB_PORT', fallback: '5432')) ?? 5432;
-  static String get dbUserName => getEnv('DB_USERNAME', fallback: 'postgres');
-  static String get dbPassword => getEnv('DB_PASSWORD', fallback: '');
-  static String get dbName => getEnv('DB_NAME', fallback: 'mydb');
-
+      int.tryParse(Platform.environment['DB_PORT'] ?? '5432') ?? 5432;
   static int get dbMaxConnCount =>
-      int.tryParse(getEnv('DB_MAX_CONN_COUNT', fallback: '10')) ?? 10;
+      int.tryParse(Platform.environment['DB_MAX_CONN_COUNT'] ?? '10') ?? 10;
+
+  static bool get isProduction =>
+      Platform.environment['IS_PRODUCTION'] == 'true';
 }

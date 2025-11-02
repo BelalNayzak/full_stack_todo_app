@@ -8,3 +8,4 @@ environment:
 
 dev_dependencies:
   melos: ^6.3.3
+  build_runner: ^2.4.6

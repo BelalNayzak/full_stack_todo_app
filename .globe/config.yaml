@@ -1,0 +1,5 @@
+# .globe/config.yaml
+project: backend-dart-frog
+source: packages/backend
+workspace: true
+deploy_from: packages/backend
