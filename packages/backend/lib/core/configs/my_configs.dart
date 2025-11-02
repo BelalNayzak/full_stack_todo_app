@@ -1,11 +1,33 @@
 import 'package:backend_dart_frog/backend.dart';
 import 'package:dotenv/dotenv.dart' as dotenv;
 
-// init & load .env variables
+// Load .env locally + platform environment on Render
 final _env = dotenv.DotEnv(includePlatformEnvironment: true)..load();
 
-// Create ONE global connections pool at startup,
-// And dart frog operates this connPool effeciently behind the scene for your requests.
+// Helper to get environment variables (Render > .env > fallback)
+String getEnv(String key, {String? fallback}) =>
+    Platform.environment[key] ?? _env[key] ?? fallback ?? '';
+
+class EnvConfigs {
+  const EnvConfigs._();
+
+  // Match Render/Supabase env vars
+  static String get tokenSecret => getEnv('TOKEN_SECRET', fallback: 'secret');
+  static String get dbHost => getEnv('SUPABASE_HOST', fallback: 'localhost');
+  static String get dbName => getEnv('SUPABASE_DB', fallback: 'postgres');
+  static String get dbUserName => getEnv('SUPABASE_USER', fallback: 'postgres');
+  static String get dbPassword => getEnv('SUPABASE_PASS', fallback: '');
+  static int get dbPort =>
+      int.tryParse(getEnv('PORT', fallback: '5432')) ?? 5432;
+  static int get dbMaxConnCount =>
+      int.tryParse(getEnv('DB_MAX_CONN_COUNT', fallback: '10')) ?? 10;
+
+  // Detect production
+  static bool get isProduction =>
+      getEnv('IS_PRODUCTION', fallback: 'false') == 'true';
+}
+
+// Create ONE global Postgres pool
 final connectionPool = Pool.withEndpoints(
   [
     Endpoint(
@@ -13,34 +35,12 @@ final connectionPool = Pool.withEndpoints(
       database: EnvConfigs.dbName,
       username: EnvConfigs.dbUserName,
       password: EnvConfigs.dbPassword,
-      port: EnvConfigs.isProduction ? EnvConfigs.dbPort : 5432,
+      port: EnvConfigs.dbPort,
     ),
   ],
   settings: PoolSettings(
-    // disable SSL for local use ONLY but enable it for production!
+    // Supabase requires SSL in production
     sslMode: EnvConfigs.isProduction ? SslMode.require : SslMode.disable,
-    // up to 10 concurrent connections
     maxConnectionCount: EnvConfigs.dbMaxConnCount,
   ),
 );
-
-String getEnv(String key, {String? fallback}) =>
-    Platform.environment[key] ?? _env[key] ?? fallback ?? '';
-
-class EnvConfigs {
-  const EnvConfigs._();
-
-  static String get tokenSecret => getEnv('TOKEN_SECRET');
-  static String get dbHost => Platform.environment['DB_HOST'] ?? 'localhost';
-  static String get dbName => Platform.environment['DB_NAME'] ?? 'postgres';
-  static String get dbUserName =>
-      Platform.environment['DB_USERNAME'] ?? 'postgres';
-  static String get dbPassword => Platform.environment['DB_PASSWORD'] ?? '';
-  static int get dbPort =>
-      int.tryParse(Platform.environment['DB_PORT'] ?? '5432') ?? 5432;
-  static int get dbMaxConnCount =>
-      int.tryParse(Platform.environment['DB_MAX_CONN_COUNT'] ?? '10') ?? 10;
-
-  static bool get isProduction =>
-      Platform.environment['IS_PRODUCTION'] == 'true';
-}
