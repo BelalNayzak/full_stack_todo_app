@@ -40,7 +40,7 @@ final connectionPool = Pool.withEndpoints(
   ],
   settings: PoolSettings(
     // Supabase requires SSL in production
-    sslMode: EnvConfigs.isProduction ? SslMode.require : SslMode.disable,
+    sslMode: EnvConfigs.isProduction ? SslMode.disable : SslMode.disable,
     maxConnectionCount: EnvConfigs.dbMaxConnCount,
   ),
 );

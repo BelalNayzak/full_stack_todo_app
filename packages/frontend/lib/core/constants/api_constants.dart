@@ -1,5 +1,7 @@
 class ApiConstants {
-  static const String baseUrl = 'http://localhost:8080';
+  static const String liveBaseUrl =
+      'https://full-stack-todo-app-jakt.onrender.com';
+  // static const String localBaseUrl = 'http://localhost:8080';
 
   static const String registerEndpoint = '/auth/register';
   static const String loginEndpoint = '/auth/login';

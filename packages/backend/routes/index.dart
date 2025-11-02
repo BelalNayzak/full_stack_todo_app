@@ -5,7 +5,7 @@ Response onRequest(RequestContext context) {
     body: {
       'status': 'ok',
       'message':
-          'Backend is running successfully 🎉\n Made with ❤️ By Belal Ashraf',
+          'Backend is running successfully 🎉\n Made with ❤️ by Belal Ashraf',
     },
   );
 }
