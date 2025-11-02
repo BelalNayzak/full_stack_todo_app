@@ -1,0 +1,4 @@
+resolution: null
+dependency_overrides:
+  shared:
+    path: .dart_frog_path_dependencies/shared
