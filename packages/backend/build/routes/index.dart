@@ -2,6 +2,7 @@ import 'package:dart_frog/dart_frog.dart';
 
 Response onRequest(RequestContext context) {
   return Response.json(
-    body: 'Backend is running successfully 🎉.\nMade with ❤️ by Belal Ashraf.',
+    body: '''|   Made with ❤️ by Belal Ashraf   |   
+        Backend is running successfully 🎉   |''',
   );
 }
