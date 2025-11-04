@@ -40,119 +40,122 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
       builder: (context, state) {
-        if (!isWide) {
+        if (isWide) {
           return Scaffold(
-            body: Container(
-              alignment: Alignment.center,
-              margin: EdgeInsets.all(16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 480),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 60),
-                    Text(
-                      'Login',
-                      style: Theme.of(context).textTheme.displayMedium
-                          ?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                    ),
-                    Spacer(),
-                    ElevatedHoverCard(child: _buildForm(state)),
-                    const SizedBox(height: 24),
-                    Spacer(),
-                    Text(
-                      'Version 1.0.0',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Made with ❤️ by Belal Ashraf',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
+            body: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(48),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        opacity: 0.3,
+                        fit: BoxFit.cover,
+                        image: AssetImage('assets/images/todo_bkg.png'),
+                      ),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primaryContainer,
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                  ],
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Login',
+                            style: Theme.of(context).textTheme.displayMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Your tasks, organized beautifully',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Manage todos across devices with a modern, responsive UI',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Version 1.0.0',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Made with ❤️ by Belal Ashraf',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 480,
+                        maxHeight: 400,
+                      ),
+                      child: ElevatedHoverCard(child: _buildForm(state)),
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         }
 
         return Scaffold(
-          body: Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(48),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primaryContainer,
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+          body: Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 60),
+                  Text(
+                    'Login',
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Login',
-                          style: Theme.of(context).textTheme.displayMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Your tasks, organized beautifully',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Manage todos across devices with a modern, responsive UI',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'Version 1.0.0',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Made with ❤️ by Belal Ashraf',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: Colors.grey.shade600),
-                        ),
-                      ],
+                  Spacer(),
+                  ElevatedHoverCard(child: _buildForm(state)),
+                  const SizedBox(height: 24),
+                  Spacer(),
+                  Text(
+                    'Version 1.0.0',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Made with ❤️ by Belal Ashraf',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade600,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                ],
               ),
-              Expanded(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 480,
-                      maxHeight: 400,
-                    ),
-                    child: ElevatedHoverCard(child: _buildForm(state)),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },

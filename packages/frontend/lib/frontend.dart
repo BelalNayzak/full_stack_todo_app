@@ -20,7 +20,6 @@ export 'package:frontend_flutter/presentation/screens/home_screen.dart';
 export 'package:frontend_flutter/presentation/screens/home_screen_web.dart';
 export 'package:frontend_flutter/presentation/screens/login_screen.dart';
 export 'package:frontend_flutter/presentation/screens/signup_screen.dart';
-export 'package:frontend_flutter/presentation/screens/signup_screen_web.dart';
 export 'package:frontend_flutter/presentation/viewmodels/auth_viewmodel.dart';
 export 'package:frontend_flutter/presentation/widgets/elevated_card.dart';
 export 'package:frontend_flutter/presentation/widgets/fancy_app_bar.dart';

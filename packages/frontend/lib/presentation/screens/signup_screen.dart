@@ -51,6 +51,11 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(48),
                     decoration: BoxDecoration(
+                      image: DecorationImage(
+                        opacity: 0.3,
+                        fit: BoxFit.cover,
+                        image: AssetImage('assets/images/todo_bkg.png'),
+                      ),
                       gradient: LinearGradient(
                         colors: [
                           Theme.of(context).colorScheme.primaryContainer,
@@ -115,8 +120,10 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           );
         }
+
         return Scaffold(
           body: Container(
+            alignment: Alignment.center,
             margin: EdgeInsets.all(16),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
