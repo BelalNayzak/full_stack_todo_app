@@ -153,18 +153,18 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
   }
 
   void _createTodo() {
-    if (_formKey.currentState!.validate()) {
-      final userState = context.read<UserCubit>().state;
-      if (userState.user != null) {
-        context.read<TodoCubit>().createTodo(
-          title: _titleController.text,
-          desc: _descController.text,
-          priority: _selectedPriority,
-          status: _selectedStatus,
-          userId: userState.user!.id!,
-        );
-        Navigator.of(context).pop();
-      }
+    // if (_formKey.currentState!.validate()) {
+    final userState = context.read<UserCubit>().state;
+    if (userState.user != null) {
+      context.read<TodoCubit>().createTodo(
+        title: _titleController.text,
+        desc: _descController.text,
+        priority: _selectedPriority,
+        status: _selectedStatus,
+        userId: userState.user!.id!,
+      );
+      Navigator.of(context).pop();
     }
+    // }
   }
 }
