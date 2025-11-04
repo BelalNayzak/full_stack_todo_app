@@ -10,6 +10,6 @@ class ApiConstants {
   static const String usersEndpoint = '/user';
   static const String todosEndpoint = '/todo';
 
-  static const Duration connectTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration connectTimeout = Duration(seconds: 70);
+  static const Duration receiveTimeout = Duration(seconds: 70);
 }
