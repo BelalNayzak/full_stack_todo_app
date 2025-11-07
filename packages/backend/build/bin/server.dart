@@ -11,6 +11,7 @@ import '../routes/user/index.dart' as user_index;
 import '../routes/user/[id].dart' as user_$id;
 import '../routes/todo/index.dart' as todo_index;
 import '../routes/todo/[id].dart' as todo_$id;
+import '../routes/chat_with_data/index.dart' as chat_with_data_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/logout.dart' as auth_logout;
 import '../routes/auth/login.dart' as auth_login;
@@ -37,6 +38,7 @@ Handler buildRootHandler() {
   final pipeline = const Pipeline().addMiddleware(middleware.middleware);
   final router = Router()
     ..mount('/auth', (context) => buildAuthHandler()(context))
+    ..mount('/chat_with_data', (context) => buildChatWithDataHandler()(context))
     ..mount('/todo', (context) => buildTodoHandler()(context))
     ..mount('/user', (context) => buildUserHandler()(context))
     ..mount('/', (context) => buildHandler()(context));
@@ -47,6 +49,13 @@ Handler buildAuthHandler() {
   final pipeline = const Pipeline().addMiddleware(auth_middleware.middleware);
   final router = Router()
     ..all('/register', (context) => auth_register.onRequest(context,))..all('/logout', (context) => auth_logout.onRequest(context,))..all('/login', (context) => auth_login.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildChatWithDataHandler() {
+  final pipeline = const Pipeline();
+  final router = Router()
+    ..all('/', (context) => chat_with_data_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
