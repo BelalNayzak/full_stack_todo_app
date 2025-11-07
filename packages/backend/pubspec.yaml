@@ -16,6 +16,7 @@ dependencies:
   dart_frog_auth: ^1.2.2
   dotenv: ^4.2.0
   json_annotation: ^4.9.0
+  dio: ^5.9.0
 
 dev_dependencies:
   dart_frog_lint: ^0.1.0

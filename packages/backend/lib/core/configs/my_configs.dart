@@ -25,6 +25,10 @@ class EnvConfigs {
   // Detect production
   static bool get isProduction =>
       getEnv('IS_PRODUCTION', fallback: 'false') == 'true';
+
+  // AI API Keys
+  static String get gemeniKey => getEnv('GEMENI_KEY', fallback: '');
+  static String get openAIKey => getEnv('OPEN_AI_KEY', fallback: '');
 }
 
 // Create ONE global Postgres pool
