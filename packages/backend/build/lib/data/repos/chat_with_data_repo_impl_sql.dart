@@ -63,11 +63,13 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     print('xxxxxxxxxx :  ${result.toString()}');
 
-    final data = result
-        .map((record) => ChatResponseModel.fromJson(record.toColumnMap()))
-        .toList();
+    return result;
 
-    return data.first;
+    // final data = result
+    //     .map((record) => ChatResponseModel.fromJson(record.toColumnMap()))
+    //     .toList();
+
+    // return data.first;
   }
 
   ///

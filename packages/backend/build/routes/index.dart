@@ -21,15 +21,12 @@ Future<Response> _onGet(RequestContext context) async {
     // data processing
     final data = result.map((record) => record.toColumnMap()).toList();
 
-    return Response.json(
-      statusCode: HttpStatus.ok,
-      body: '${data.first['msg']}',
-    );
+    return Response.json(statusCode: HttpStatus.ok, body: '${data.toString()}');
   } catch (e) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body:
-          'Sorry, Please try again after in 1-2 minute(s). The api was in sleep-mode and it\'s waking up now...',
+          'If the backend is not working properly, Please try again after 1-2 minute(s). The api service could be in sleep-mode and is waking up...',
     );
   }
 }
