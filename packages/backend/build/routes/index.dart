@@ -3,7 +3,6 @@ import 'package:backend_dart_frog/backend.dart';
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
     HttpMethod.get => _onGet(context),
-    HttpMethod.post => _onPost(context),
     _ => Future.value(
       Response(
         statusCode: HttpStatus.methodNotAllowed,
@@ -14,13 +13,6 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> _onGet(RequestContext context) async {
-  return Response.json(
-    body:
-        '''|   Backend is running successfully 🎉   |   Made with ❤️ by Belal Ashraf   |''',
-  );
-}
-
-Future<Response> _onPost(RequestContext context) async {
   try {
     final result = await context.read<Pool>().execute(
       Sql.named('SELECT * FROM "uptime_robot_msg" ORDER BY "id" ASC'),
