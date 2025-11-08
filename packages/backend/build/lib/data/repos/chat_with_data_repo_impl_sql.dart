@@ -13,6 +13,8 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   @override
   // Future<ChatResponseModel> chatWithData(String userMsg) async {
   Future<dynamic> chatWithData(String userMsg) async {
+    print('xxxxxxxxxx 1 : $userMsg');
+
     // 1️⃣ Build prompt for LLM
     final prompt =
         '''
@@ -26,6 +28,8 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
           User request: "$userMsg"
         ''';
+
+    print('xxxxxxxxxx 2 : $prompt');
 
     // 2️⃣ Call LLM (Gemeni)
     final llmResponse = await dio.Dio().post(
@@ -42,14 +46,33 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       },
     );
 
+    print('xxxxxxxxxx 3.1 : ${llmResponse.toString()}');
+    print('xxxxxxxxxx 3.2 : ${llmResponse.data['candidates']}');
+    print('xxxxxxxxxx 3.3 : ${llmResponse.data['candidates'][0]}');
+    print('xxxxxxxxxx 3.4 : ${llmResponse.data['candidates'][0]['content']}');
+    print(
+      'xxxxxxxxxx 3.5 : ${llmResponse.data['candidates'][0]['content']['parts']}',
+    );
+    print(
+      'xxxxxxxxxx 3.6 : ${llmResponse.data['candidates'][0]['content']['parts'][0]}',
+    );
+    print(
+      'xxxxxxxxxx 3.7 : ${llmResponse.data['candidates'][0]['content']['parts'][0]['text']}',
+    );
+
     final content =
         llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
-    final sqlGeneratedQuerey = (content['sql'] as String).trim();
+    print('xxxxxxxxxx 4 : ${content}');
+
+    final sqlGeneratedQuery = (content['sql'] as String).trim();
+    print('xxxxxxxxxx 5 : ${sqlGeneratedQuery}');
+
     final sqlGeneratedQueryParams = (content['params'] as String).trim();
+    print('xxxxxxxxxx 6 : ${sqlGeneratedQueryParams}');
 
     // 3️⃣ Safety checks
-    if (!sqlGeneratedQuerey.toLowerCase().startsWith('select') ||
-        sqlGeneratedQuerey.contains(';')) {
+    if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
+        sqlGeneratedQuery.contains(';')) {
       throw Exception({
         'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
       });
@@ -57,7 +80,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     // 4️⃣ Excecute query to supabase (Postgres)
     final result = await connPool.execute(
-      Sql.named(sqlGeneratedQuerey),
+      Sql.named(sqlGeneratedQuery),
       parameters: sqlGeneratedQueryParams,
     );
 
