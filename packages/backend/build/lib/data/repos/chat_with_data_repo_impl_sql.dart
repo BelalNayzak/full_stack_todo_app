@@ -1,5 +1,6 @@
 import 'package:backend_dart_frog/backend.dart';
-import 'package:dio/dio.dart' as dio; // only used here to call the LLM
+import 'package:dio/dio.dart' as dio;
+import 'package:logger/logger.dart'; // only used here to call the LLM
 
 class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   final Pool connPool;
@@ -13,7 +14,9 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   @override
   // Future<ChatResponseModel> chatWithData(String userMsg) async {
   Future<dynamic> chatWithData(String userMsg) async {
-    print('xxxxxxxxxx 1 : $userMsg');
+    Logger x = Logger();
+
+    x.i('xxxxxxxxxx 1 : $userMsg');
 
     // 1️⃣ Build prompt for LLM
     final prompt =
@@ -29,7 +32,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
           User request: "$userMsg"
         ''';
 
-    print('xxxxxxxxxx 2 : $prompt');
+    x.i('xxxxxxxxxx 2 : $prompt');
 
     // 2️⃣ Call LLM (Gemeni)
     final llmResponse = await dio.Dio().post(
@@ -46,29 +49,29 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       },
     );
 
-    print('xxxxxxxxxx 3.1 : ${llmResponse.toString()}');
-    print('xxxxxxxxxx 3.2 : ${llmResponse.data['candidates']}');
-    print('xxxxxxxxxx 3.3 : ${llmResponse.data['candidates'][0]}');
-    print('xxxxxxxxxx 3.4 : ${llmResponse.data['candidates'][0]['content']}');
-    print(
+    x.i('xxxxxxxxxx 3.1 : ${llmResponse.toString()}');
+    x.i('xxxxxxxxxx 3.2 : ${llmResponse.data['candidates']}');
+    x.i('xxxxxxxxxx 3.3 : ${llmResponse.data['candidates'][0]}');
+    x.i('xxxxxxxxxx 3.4 : ${llmResponse.data['candidates'][0]['content']}');
+    x.i(
       'xxxxxxxxxx 3.5 : ${llmResponse.data['candidates'][0]['content']['parts']}',
     );
-    print(
+    x.i(
       'xxxxxxxxxx 3.6 : ${llmResponse.data['candidates'][0]['content']['parts'][0]}',
     );
-    print(
+    x.i(
       'xxxxxxxxxx 3.7 : ${llmResponse.data['candidates'][0]['content']['parts'][0]['text']}',
     );
 
     final content =
         llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
-    print('xxxxxxxxxx 4 : ${content}');
+    x.i('xxxxxxxxxx 4 : ${content}');
 
     final sqlGeneratedQuery = (content['sql'] as String).trim();
-    print('xxxxxxxxxx 5 : ${sqlGeneratedQuery}');
+    x.i('xxxxxxxxxx 5 : ${sqlGeneratedQuery}');
 
     final sqlGeneratedQueryParams = (content['params'] as String).trim();
-    print('xxxxxxxxxx 6 : ${sqlGeneratedQueryParams}');
+    x.i('xxxxxxxxxx 6 : ${sqlGeneratedQueryParams}');
 
     // 3️⃣ Safety checks
     if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
@@ -84,7 +87,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       parameters: sqlGeneratedQueryParams,
     );
 
-    print('xxxxxxxxxx :  ${result.toString()}');
+    x.i('xxxxxxxxxx :  ${result.toString()}');
 
     return result;
 
