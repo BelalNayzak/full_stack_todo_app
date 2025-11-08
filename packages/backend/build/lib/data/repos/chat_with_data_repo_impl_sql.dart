@@ -73,6 +73,8 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
     final sqlGeneratedQueryParams = (content['params'] as String).trim();
     x.i('xxxxxxxxxx 6 : ${sqlGeneratedQueryParams}');
 
+    return content;
+
     // 3️⃣ Safety checks
     if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
         sqlGeneratedQuery.contains(';')) {
