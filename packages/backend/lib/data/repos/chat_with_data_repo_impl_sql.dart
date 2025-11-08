@@ -14,9 +14,15 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   @override
   // Future<ChatResponseModel> chatWithData(String userMsg) async {
   Future<dynamic> chatWithData(String userMsg) async {
-    Logger x = Logger();
+    Logger x = Logger(
+      printer: SimplePrinter(colors: false),
+      output: ConsoleOutput(), // forces stdout.writeln
+    );
 
-    x.i('xxxxxxxxxx 1 : $userMsg');
+    x.i('xxxxxxxxxx 1.1 : $userMsg');
+
+    stdout.writeln('xxxxxxxxxx 1.2 : $userMsg');
+    stdout.flush(); // forces write
 
     // 1️⃣ Build prompt for LLM
     final prompt =
@@ -36,7 +42,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     // 2️⃣ Call LLM (Gemeni)
     final llmResponse = await dio.Dio().post(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
+      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
       options: dio.Options(headers: {'Content-Type': 'application/json'}),
       data: {
         'contents': [
@@ -75,23 +81,23 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     return content;
 
-    // 3️⃣ Safety checks
-    if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
-        sqlGeneratedQuery.contains(';')) {
-      throw Exception({
-        'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
-      });
-    }
+    // // 3️⃣ Safety checks
+    // if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
+    //     sqlGeneratedQuery.contains(';')) {
+    //   throw Exception({
+    //     'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
+    //   });
+    // }
 
-    // 4️⃣ Excecute query to supabase (Postgres)
-    final result = await connPool.execute(
-      Sql.named(sqlGeneratedQuery),
-      parameters: sqlGeneratedQueryParams,
-    );
+    // // 4️⃣ Excecute query to supabase (Postgres)
+    // final result = await connPool.execute(
+    //   Sql.named(sqlGeneratedQuery),
+    //   parameters: sqlGeneratedQueryParams,
+    // );
 
-    x.i('xxxxxxxxxx :  ${result.toString()}');
+    // x.i('xxxxxxxxxx :  ${result.toString()}');
 
-    return result;
+    // return result;
 
     // final data = result
     //     .map((record) => ChatResponseModel.fromJson(record.toColumnMap()))
@@ -104,63 +110,63 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   /// USING OPEN AI : -----------------------------------------------
   ///
 
-  @override
-  Future<ChatResponseModel> _chatWithData(String userMsg) async {
-    // 1️⃣ Build prompt for LLM
-    final prompt =
-        '''
-          You are a SQL generator for Postgres.
-          Return valid JSON: {"sql": "...", "params": {}, "summary": "..."}
-          Allowed only SELECT queries. Never modify data.
+  // @override
+  // Future<ChatResponseModel> _chatWithData(String userMsg) async {
+  //   // 1️⃣ Build prompt for LLM
+  //   final prompt =
+  //       '''
+  //         You are a SQL generator for Postgres.
+  //         Return valid JSON: {"sql": "...", "params": {}, "summary": "..."}
+  //         Allowed only SELECT queries. Never modify data.
 
-          Schema example:
-          table todo(id int, user_id int, title text, desc text, status text, priority text);
-          table user(id int, name text, email text, password text);
+  //         Schema example:
+  //         table todo(id int, user_id int, title text, desc text, status text, priority text);
+  //         table user(id int, name text, email text, password text);
 
-          User request: "$userMsg"
-        ''';
+  //         User request: "$userMsg"
+  //       ''';
 
-    // 2️⃣ Call LLM (OpenAI)
-    final llmResponse = await dio.Dio().post(
-      'https://api.openai.com/v1/chat/completions',
-      options: dio.Options(
-        headers: {
-          'Authorization': 'Bearer ${EnvConfigs.openAIKey}',
-          'Content-Type': 'application/json',
-        },
-      ),
-      data: {
-        'model': 'gpt-4o-mini',
-        'messages': [
-          {'role': 'system', 'content': 'You are a Postgres SQL generator.'},
-          {'role': 'user', 'content': prompt},
-        ],
-        'response_format': {'type': 'json_object'},
-      },
-    );
+  //   // 2️⃣ Call LLM (OpenAI)
+  //   final llmResponse = await dio.Dio().post(
+  //     'https://api.openai.com/v1/chat/completions',
+  //     options: dio.Options(
+  //       headers: {
+  //         'Authorization': 'Bearer ${EnvConfigs.openAIKey}',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     ),
+  //     data: {
+  //       'model': 'gpt-4o-mini',
+  //       'messages': [
+  //         {'role': 'system', 'content': 'You are a Postgres SQL generator.'},
+  //         {'role': 'user', 'content': prompt},
+  //       ],
+  //       'response_format': {'type': 'json_object'},
+  //     },
+  //   );
 
-    final content = llmResponse.data['choices'][0]['message']['content'];
-    final sqlGeneratedQuerey = (content['sql'] as String).trim();
-    final sqlGeneratedQueryParams = (content['params'] as String).trim();
+  //   final content = llmResponse.data['choices'][0]['message']['content'];
+  //   final sqlGeneratedQuerey = (content['sql'] as String).trim();
+  //   final sqlGeneratedQueryParams = (content['params'] as String).trim();
 
-    // 3️⃣ Safety checks
-    if (!sqlGeneratedQuerey.toLowerCase().startsWith('select') ||
-        sqlGeneratedQuerey.contains(';')) {
-      throw Exception(
-        Response.json(statusCode: 400, body: {'error': 'Unsafe SQL'}),
-      );
-    }
+  //   // 3️⃣ Safety checks
+  //   if (!sqlGeneratedQuerey.toLowerCase().startsWith('select') ||
+  //       sqlGeneratedQuerey.contains(';')) {
+  //     throw Exception(
+  //       Response.json(statusCode: 400, body: {'error': 'Unsafe SQL'}),
+  //     );
+  //   }
 
-    // 4️⃣ Excecute query to supabase (Postgres)
-    final result = await connPool.execute(
-      Sql.named(sqlGeneratedQuerey),
-      parameters: sqlGeneratedQueryParams,
-    );
+  //   // 4️⃣ Excecute query to supabase (Postgres)
+  //   final result = await connPool.execute(
+  //     Sql.named(sqlGeneratedQuerey),
+  //     parameters: sqlGeneratedQueryParams,
+  //   );
 
-    final data = result
-        .map((record) => ChatResponseModel.fromJson(record.toColumnMap()))
-        .toList();
+  //   final data = result
+  //       .map((record) => ChatResponseModel.fromJson(record.toColumnMap()))
+  //       .toList();
 
-    return data.first;
-  }
+  //   return data.first;
+  // }
 }
