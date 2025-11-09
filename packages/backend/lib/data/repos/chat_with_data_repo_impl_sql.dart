@@ -41,7 +41,8 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     // 2️⃣ Call LLM (Gemeni)
     final llmResponse = await dio.Dio().post(
-      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
+      // 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
+      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyAWhc9SlOvXlWtl3HOViBPFWcMzs08NiAo',
       options: dio.Options(headers: {'Content-Type': 'application/json'}),
       data: jsonEncode({
         'contents': [
@@ -65,34 +66,29 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
     final llmParsedData = jsonDecode(cleaned);
 
     final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
+    final sqlGeneratedQueryParams = llmParsedData['params'];
 
-    final sqlGeneratedQueryParams = (llmParsedData['params'] as String).trim();
+    // 3️⃣ Safety checks
+    if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
+        sqlGeneratedQuery.contains(';')) {
+      throw Exception({
+        'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
+      });
+    }
 
-    return llmResponse.data;
-
-    // // 3️⃣ Safety checks
-    // if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
-    //     sqlGeneratedQuery.contains(';')) {
-    //   throw Exception({
-    //     'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
-    //   });
-    // }
-
-    // // 4️⃣ Excecute query to supabase (Postgres)
-    // final result = await connPool.execute(
-    //   Sql.named(sqlGeneratedQuery),
-    //   parameters: sqlGeneratedQueryParams,
-    // );
-
-    // x.i('xxxxxxxxxx :  ${result.toString()}');
-
-    // return result;
+    // 4️⃣ Excecute query to supabase (Postgres)
+    final result = await connPool.execute(
+      Sql.named(sqlGeneratedQuery),
+      parameters: sqlGeneratedQueryParams,
+    );
 
     // final data = result
     //     .map((record) => ChatResponseModel.fromJson(record.toColumnMap()))
     //     .toList();
 
-    // return data.first;
+    final data = result.map((record) => record.toColumnMap()).toList();
+
+    return data;
   }
 
   ///
