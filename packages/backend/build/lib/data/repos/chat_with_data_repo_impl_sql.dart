@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:backend_dart_frog/backend.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:logger/logger.dart'; // only used here to call the LLM
@@ -38,13 +40,11 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
           User request: "$userMsg"
         ''';
 
-    x.i('xxxxxxxxxx 2 : $prompt');
-
     // 2️⃣ Call LLM (Gemeni)
     final llmResponse = await dio.Dio().post(
       'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
       options: dio.Options(headers: {'Content-Type': 'application/json'}),
-      data: {
+      data: jsonEncode({
         'contents': [
           {
             'parts': [
@@ -52,32 +52,19 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
             ],
           },
         ],
-      },
+      }),
     );
 
-    x.i('xxxxxxxxxx 3.1 : ${llmResponse.toString()}');
-    x.i('xxxxxxxxxx 3.2 : ${llmResponse.data['candidates']}');
-    x.i('xxxxxxxxxx 3.3 : ${llmResponse.data['candidates'][0]}');
-    x.i('xxxxxxxxxx 3.4 : ${llmResponse.data['candidates'][0]['content']}');
-    x.i(
-      'xxxxxxxxxx 3.5 : ${llmResponse.data['candidates'][0]['content']['parts']}',
-    );
-    x.i(
-      'xxxxxxxxxx 3.6 : ${llmResponse.data['candidates'][0]['content']['parts'][0]}',
-    );
     x.i(
       'xxxxxxxxxx 3.7 : ${llmResponse.data['candidates'][0]['content']['parts'][0]['text']}',
     );
 
-    final content =
-        llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
-    x.i('xxxxxxxxxx 4 : ${content}');
+    final llmData = jsonDecode(llmResponse.data);
+    final content = llmData['candidates'][0]['content']['parts'][0]['text'];
 
     final sqlGeneratedQuery = (content['sql'] as String).trim();
-    x.i('xxxxxxxxxx 5 : ${sqlGeneratedQuery}');
 
     final sqlGeneratedQueryParams = (content['params'] as String).trim();
-    x.i('xxxxxxxxxx 6 : ${sqlGeneratedQueryParams}');
 
     return content;
 
