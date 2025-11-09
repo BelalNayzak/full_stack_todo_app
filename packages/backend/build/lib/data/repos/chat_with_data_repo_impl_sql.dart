@@ -21,21 +21,28 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       output: ConsoleOutput(), // forces stdout.writeln
     );
 
-    x.i('xxxxxxxxxx 1.1 : $userMsg');
-
-    stdout.writeln('xxxxxxxxxx 1.2 : $userMsg');
     stdout.flush(); // forces write
 
     // 1️⃣ Build prompt for LLM
     final prompt =
         '''
           You are a SQL generator for Postgres.
-          Return valid JSON: {"sql": "...", "params": {}, "summary": "..."}
+          Return ONLY valid JSON (no markdown, no code fences, no explanations, no text outside JSON).
+          Format:
+          {
+            "sql": "...",
+            "params": {},
+            "summary": "..."
+          }
           Allowed only SELECT queries. Never modify data.
 
           Schema example:
           table todo(id int, user_id int, title text, desc text, status text, priority text);
           table user(id int, name text, email text, password text);
+
+          knowing that:
+          The status in the todo table must be a value of these values only ("todo", "inProgress", "done")
+          and The priority in the todo table must be a value of these values only ("low", "medium", "high")
 
           User request: "$userMsg"
         ''';
@@ -53,10 +60,6 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
           },
         ],
       }),
-    );
-
-    x.i(
-      'xxxxxxxxxx 3.7 : ${llmResponse.data['candidates'][0]['content']['parts'][0]['text']}',
     );
 
     final cleaned = llmResponse.data
