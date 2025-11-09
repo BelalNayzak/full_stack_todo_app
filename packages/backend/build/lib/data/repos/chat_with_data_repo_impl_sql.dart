@@ -76,9 +76,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     // 3️⃣ Safety checks
     if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
-      throw Exception({
-        'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
-      });
+      throw Exception({'Unsafe SQL Query.'});
     }
 
     // 4️⃣ Excecute query to supabase (Postgres)

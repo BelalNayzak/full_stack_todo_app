@@ -19,6 +19,7 @@ import '../routes/auth/login.dart' as auth_login;
 import '../routes/_middleware.dart' as middleware;
 import '../routes/user/_middleware.dart' as user_middleware;
 import '../routes/todo/_middleware.dart' as todo_middleware;
+import '../routes/chat_with_data/_middleware.dart' as chat_with_data_middleware;
 import '../routes/auth/_middleware.dart' as auth_middleware;
 
 void main() async {
@@ -53,7 +54,7 @@ Handler buildAuthHandler() {
 }
 
 Handler buildChatWithDataHandler() {
-  final pipeline = const Pipeline();
+  final pipeline = const Pipeline().addMiddleware(chat_with_data_middleware.middleware);
   final router = Router()
     ..all('/', (context) => chat_with_data_index.onRequest(context,));
   return pipeline.addHandler(router);
