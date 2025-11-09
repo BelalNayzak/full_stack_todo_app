@@ -4,14 +4,12 @@ part 'chat_response_model.g.dart';
 
 @JsonSerializable()
 class ChatResponseModel {
-  final int? id;
-  final Map<String, dynamic> rows;
-  final String? responseMsg;
+  final List<Map<String, dynamic>> responseData;
+  final String? responseSummary;
 
   const ChatResponseModel({
-    required this.id,
-    required this.rows,
-    required this.responseMsg,
+    required this.responseSummary,
+    required this.responseData,
   });
 
   factory ChatResponseModel.fromJson(Map<String, dynamic> json) =>

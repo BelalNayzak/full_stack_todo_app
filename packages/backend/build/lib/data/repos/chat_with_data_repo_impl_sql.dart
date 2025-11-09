@@ -13,48 +13,16 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   ///
 
   @override
-  // Future<ChatResponseModel> chatWithData(String userMsg) async {
-  Future<dynamic> chatWithData(String userMsg) async {
-    // 1️⃣ Build prompt for LLM
-    final prompt =
-        '''
-          You are a SQL generator for Postgres.
-          Return ONLY valid JSON (no markdown, no code fences, no explanations).
-          When generating SQL, always:
-          - Use single quotes ('...') for string values.
-          - Do NOT use double quotes for strings.
-          - Do NOT wrap keywords like SELECT, FROM, WHERE in quotes.
-          - Do NOT wrap table names or column names like todo, user in quotes.
-
-          Return JSON in this format:
-          {
-            "sql": "...",
-            "params": {},
-            "summary": "..."
-          }
-          Allowed only SELECT queries. Never modify data.
-
-          Schema example:
-          table todo(id int, user_id int, title text, desc text, status text, priority text);
-          table user(id int, name text, email text, password text);
-
-          knowing that:
-          The status in the todo table must be string a value of these values only ("todo", "inProgress", "done")
-          and The priority in the todo table must be a string value of these values only ("low", "medium", "high")
-
-          User request: "$userMsg"
-        ''';
-
+  Future<ChatResponseModel> chatWithData(int userId, String userMsg) async {
     // 2️⃣ Call LLM (Gemeni)
     final llmResponse = await dio.Dio().post(
-      // 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
-      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyAWhc9SlOvXlWtl3HOViBPFWcMzs08NiAo',
+      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
       options: dio.Options(headers: {'Content-Type': 'application/json'}),
       data: jsonEncode({
         'contents': [
           {
             'parts': [
-              {'text': prompt},
+              {'text': _buildAiPrompt(userId, userMsg)},
             ],
           },
         ],
@@ -73,6 +41,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
     final sqlGeneratedQueryParams = llmParsedData['params'];
+    final sqlGeneratedQuerySummary = llmParsedData['summary'];
 
     // 3️⃣ Safety checks
     if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
@@ -85,13 +54,12 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       parameters: sqlGeneratedQueryParams,
     );
 
-    // final data = result
-    //     .map((record) => ChatResponseModel.fromJson(record.toColumnMap()))
-    //     .toList();
-
     final data = result.map((record) => record.toColumnMap()).toList();
 
-    return data;
+    return ChatResponseModel(
+      responseSummary: sqlGeneratedQuerySummary,
+      responseData: data,
+    );
   }
 
   ///
@@ -157,4 +125,40 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
   //   return data.first;
   // }
+}
+
+// 1️⃣ Build prompt for LLM
+String _buildAiPrompt(int userId, String userMsg) {
+  return '''
+          You are a SQL generator for Postgres.
+          Return ONLY valid JSON (no markdown, no code fences, no explanations).
+          When generating SQL, always:
+          - Use single quotes ('...') for string values.
+          - Do NOT use double quotes for strings.
+          - Do NOT wrap keywords like SELECT, FROM, WHERE in quotes.
+          - Wrap table names and column names like todo, user in double quotes.
+          - Use User's ID to get ONLY user's related data (knowing that: user_id = $userId).
+          - Do NOT ge any data that is not attached to that user (user in not authorized to get any data not attached to him somehow).
+
+          Return JSON in this format:
+          {
+            "sql": "...",
+            "params": {
+              "key": value,
+              ...
+            },
+            "summary": "..."
+          }
+          Allowed only SELECT queries. Never modify data.
+
+          Schema example:
+          table todo(id int, user_id int, title text, desc text, status text, priority text);
+          table user(id int, name text, email text, password text);
+
+          Knowing that:
+          - The status in the todo table must be string a value of these values only ("todo", "inProgress", "done")
+          - The priority in the todo table must be a string value of these values only ("low", "medium", "high")
+
+          User request: "$userMsg"
+        ''';
 }

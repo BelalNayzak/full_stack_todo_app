@@ -8,14 +8,14 @@ part of 'chat_response_model.dart';
 
 ChatResponseModel _$ChatResponseModelFromJson(Map<String, dynamic> json) =>
     ChatResponseModel(
-      id: (json['id'] as num?)?.toInt(),
-      rows: json['rows'] as Map<String, dynamic>,
-      responseMsg: json['responseMsg'] as String?,
+      responseSummary: json['responseSummary'] as String?,
+      responseData: (json['responseData'] as List<dynamic>)
+          .map((e) => e as Map<String, dynamic>)
+          .toList(),
     );
 
 Map<String, dynamic> _$ChatResponseModelToJson(ChatResponseModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'rows': instance.rows,
-      'responseMsg': instance.responseMsg,
+      'responseData': instance.responseData,
+      'responseSummary': instance.responseSummary,
     };

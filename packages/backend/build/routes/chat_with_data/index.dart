@@ -16,23 +16,21 @@ Future<Response> onRequest(RequestContext context) async {
 Future<Response> _onPost(RequestContext context) async {
   final reqBody = await context.request.json() as Map<String, dynamic>;
   final userMsg = reqBody['message'] as String;
+  final userId = reqBody['user_id'] as int;
 
   try {
-    final data = await context.read<ChatWithDataRepo>().chatWithData(userMsg);
-    // // 5️⃣ Return to Flutter
-    // return Response.json(
-    //   body: {
-    //     'rows': result.map((r) => r.toColumnMap()).toList(),
-    //     'summary': jsonOut['summary'] ?? '',
-    //   },
-    // );
+    final data = await context.read<ChatWithDataRepo>().chatWithData(
+      userId,
+      userMsg,
+    );
 
+    // 5️⃣ Return to Flutter
     return Response.json(
       statusCode: HttpStatus.ok,
       body: {
         'success': true,
-        'message': 'Todo created successfully',
-        'data': data,
+        'message': data.responseSummary,
+        'data': data.responseData,
       },
     );
   } catch (e) {
