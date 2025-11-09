@@ -38,6 +38,10 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
           table todo(id int, user_id int, title text, desc text, status text, priority text);
           table user(id int, name text, email text, password text);
 
+          knowing that:
+          The status in the todo table must be string a value of these values only ("todo", "inProgress", "done")
+          and The priority in the todo table must be a string value of these values only ("low", "medium", "high")
+
           User request: "$userMsg"
         ''';
 
@@ -71,8 +75,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
     final sqlGeneratedQueryParams = llmParsedData['params'];
 
     // 3️⃣ Safety checks
-    if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
-        sqlGeneratedQuery.contains(';')) {
+    if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
       throw Exception({
         'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
       });
