@@ -59,8 +59,14 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       'xxxxxxxxxx 3.7 : ${llmResponse.data['candidates'][0]['content']['parts'][0]['text']}',
     );
 
-    final llmData = jsonDecode(llmResponse.data);
-    final content = llmData['candidates'][0]['content']['parts'][0]['text'];
+    final cleaned = llmResponse.data
+        .replaceAll(RegExp(r'```json'), '')
+        .replaceAll(RegExp(r'```'), '')
+        .trim();
+
+    final llmParsedData = jsonDecode(cleaned);
+    final content =
+        llmParsedData['candidates'][0]['content']['parts'][0]['text'];
 
     final sqlGeneratedQuery = (content['sql'] as String).trim();
 
