@@ -1,5 +1,4 @@
 import 'package:backend_dart_frog/backend.dart';
-import 'package:logger/logger.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
@@ -37,9 +36,6 @@ Future<Response> _onPost(RequestContext context) async {
       },
     );
   } catch (e) {
-    Logger x = Logger();
-    x.i('xxxxxxxxxx 1 : $userMsg');
-
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {

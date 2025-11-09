@@ -68,7 +68,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     final sqlGeneratedQueryParams = (llmParsedData['params'] as String).trim();
 
-    return sqlGeneratedQuery;
+    return llmResponse.data;
 
     // // 3️⃣ Safety checks
     // if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
