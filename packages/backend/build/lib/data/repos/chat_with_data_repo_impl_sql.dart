@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:backend_dart_frog/backend.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:logger/logger.dart'; // only used here to call the LLM
 
 class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   final Pool connPool;
@@ -16,13 +15,6 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   @override
   // Future<ChatResponseModel> chatWithData(String userMsg) async {
   Future<dynamic> chatWithData(String userMsg) async {
-    Logger x = Logger(
-      printer: SimplePrinter(colors: false),
-      output: ConsoleOutput(), // forces stdout.writeln
-    );
-
-    stdout.flush(); // forces write
-
     // 1️⃣ Build prompt for LLM
     final prompt =
         '''
@@ -62,20 +54,21 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       }),
     );
 
-    final cleaned = llmResponse.data
+    final content =
+        llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
+
+    final cleaned = content
         .replaceAll(RegExp(r'```json'), '')
         .replaceAll(RegExp(r'```'), '')
         .trim();
 
     final llmParsedData = jsonDecode(cleaned);
-    final content =
-        llmParsedData['candidates'][0]['content']['parts'][0]['text'];
 
-    final sqlGeneratedQuery = (content['sql'] as String).trim();
+    final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
 
-    final sqlGeneratedQueryParams = (content['params'] as String).trim();
+    final sqlGeneratedQueryParams = (llmParsedData['params'] as String).trim();
 
-    return content;
+    return sqlGeneratedQuery;
 
     // // 3️⃣ Safety checks
     // if (!sqlGeneratedQuery.toLowerCase().startsWith('select') ||
