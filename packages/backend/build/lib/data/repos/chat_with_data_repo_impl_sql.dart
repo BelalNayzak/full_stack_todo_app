@@ -19,8 +19,14 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
     final prompt =
         '''
           You are a SQL generator for Postgres.
-          Return ONLY valid JSON (no markdown, no code fences, no explanations, no text outside JSON).
-          Format:
+          Return ONLY valid JSON (no markdown, no code fences, no explanations).
+          When generating SQL, always:
+          - Use single quotes ('...') for string values.
+          - Do NOT use double quotes for strings.
+          - Do NOT wrap keywords like SELECT, FROM, WHERE in quotes.
+          - Do NOT wrap table names or column names like todo, user in quotes.
+
+          Return JSON in this format:
           {
             "sql": "...",
             "params": {},
@@ -31,10 +37,6 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
           Schema example:
           table todo(id int, user_id int, title text, desc text, status text, priority text);
           table user(id int, name text, email text, password text);
-
-          knowing that:
-          The status in the todo table must be a value of these values only ("todo", "inProgress", "done")
-          and The priority in the todo table must be a value of these values only ("low", "medium", "high")
 
           User request: "$userMsg"
         ''';
