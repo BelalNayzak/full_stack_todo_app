@@ -40,7 +40,7 @@ Future<Response> _onPost(RequestContext context) async {
         'success': false,
         'message':
             'Unsafe SQL Query. It seems you\'re requesting a heavy or a non authorized data',
-        'ERR': e,
+        'ERR': e.toString(),
       },
     );
   }

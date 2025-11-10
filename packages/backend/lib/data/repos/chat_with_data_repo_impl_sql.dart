@@ -45,7 +45,10 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       final sqlGeneratedQueryMsg = llmParsedData['summary'];
 
       // 3️⃣ Safety checks
-      if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
+      if (sqlGeneratedQuery.toLowerCase().contains('delete') ||
+          sqlGeneratedQuery.toLowerCase().contains('post') ||
+          sqlGeneratedQuery.toLowerCase().contains('put') ||
+          sqlGeneratedQuery.toLowerCase().contains('truncate')) {
         throw Exception({'Unsafe SQL Query.'});
       }
 
@@ -69,6 +72,8 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
         '❌ Status code: ${e.response?.statusCode}',
         '❌ Message: ${e.message}',
       };
+    } catch (e) {
+      throw {'❌ Other error: ${e.toString()}'};
     }
   }
 
