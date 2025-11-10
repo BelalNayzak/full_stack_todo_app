@@ -113,12 +113,15 @@ class HomeScreenWeb extends StatelessWidget {
               },
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => showDialog(
+          floatingActionButton: ExpandableFab(
+            onCreateTodo: () => showDialog(
               context: context,
               builder: (_) => const AddTodoDialog(),
             ),
-            child: const Icon(Icons.add),
+            onChatWithData: () => showDialog(
+              context: context,
+              builder: (_) => const ChatDialogWeb(),
+            ),
           ),
         );
       },

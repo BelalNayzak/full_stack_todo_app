@@ -15,6 +15,7 @@ class TodoApp extends StatelessWidget {
         BlocProvider<TodoCubit>(create: (context) => TodoCubit(TodoService())),
         BlocProvider<UserCubit>(create: (context) => UserCubit(UserService())),
         BlocProvider<AuthCubit>(create: (context) => AuthCubit(AuthService())),
+        BlocProvider<ChatCubit>(create: (context) => ChatCubit(ChatService())),
       ],
       child: RequestsInspector(
         navigatorKey: navigatorKey,

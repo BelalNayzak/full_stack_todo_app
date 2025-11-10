@@ -186,10 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _showAddTodoDialog(context),
-            tooltip: 'Add Todo',
-            child: const Icon(Icons.add),
+          floatingActionButton: ExpandableFab(
+            onCreateTodo: () => _showAddTodoDialog(context),
+            onChatWithData: () => _showChatBottomSheet(context),
           ),
         );
       },
@@ -198,6 +197,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showAddTodoDialog(BuildContext context) {
     showDialog(context: context, builder: (context) => const AddTodoDialog());
+  }
+
+  void _showChatBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const ChatBottomSheet(),
+    );
   }
 
   void _showLogoutConfirmation(BuildContext context) {

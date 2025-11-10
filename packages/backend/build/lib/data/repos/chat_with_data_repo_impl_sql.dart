@@ -41,7 +41,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
     final sqlGeneratedQueryParams = llmParsedData['params'];
-    final sqlGeneratedQuerySummary = llmParsedData['summary'];
+    final sqlGeneratedQueryMsg = llmParsedData['summary'];
 
     // 3️⃣ Safety checks
     if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
@@ -57,7 +57,9 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
     final data = result.map((record) => record.toColumnMap()).toList();
 
     return ChatResponseModel(
-      responseSummary: sqlGeneratedQuerySummary,
+      usedQuery: sqlGeneratedQuery,
+      usedQueryParams: sqlGeneratedQueryParams,
+      responseMsg: sqlGeneratedQueryMsg,
       responseData: data,
     );
   }

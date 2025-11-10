@@ -29,7 +29,7 @@ Future<Response> _onPost(RequestContext context) async {
       statusCode: HttpStatus.ok,
       body: {
         'success': true,
-        'message': data.responseSummary,
+        'message': data.responseMsg,
         'data': data.responseData,
       },
     );
