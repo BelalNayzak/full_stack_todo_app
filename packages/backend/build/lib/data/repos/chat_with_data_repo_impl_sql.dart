@@ -80,7 +80,12 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
         'sqlGeneratedQueryMsg': sqlGeneratedQueryMsg,
       });
     } catch (e) {
-      throw Exception({'Other error': e.toString()});
+      throw Exception({
+        'Other error': e.toString(),
+        'sqlGeneratedQuery': sqlGeneratedQuery,
+        'sqlGeneratedQueryParams': sqlGeneratedQueryParams,
+        'sqlGeneratedQueryMsg': sqlGeneratedQueryMsg,
+      });
     }
   }
 
