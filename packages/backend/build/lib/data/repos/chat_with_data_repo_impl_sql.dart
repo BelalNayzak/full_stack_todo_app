@@ -166,6 +166,8 @@ String _buildAiPrompt(int userId, String userMsg) {
           - Wrap table names and column names like todo, user in double quotes.
           - Use User's ID to get ONLY user's related data (knowing that: user_id = $userId).
           - Do NOT get any data that is not attached to that user (user in not authorized to get any data not attached to him somehow).
+          - Refer to named parameters with the @ sign (example:  SELECT * FROM "table_name" WHERE "id" = @id RETURNING *)
+          - Return everything from the server responser (example:  ...RETURNING *)
 
           Return JSON in this format:
           {
