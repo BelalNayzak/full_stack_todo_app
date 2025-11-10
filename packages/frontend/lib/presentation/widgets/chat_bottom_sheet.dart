@@ -1,6 +1,5 @@
 import 'package:frontend_flutter/frontend.dart';
 import 'package:intl/intl.dart';
-import 'package:markdown_widget/widget/markdown.dart';
 
 class ChatBottomSheet extends StatefulWidget {
   const ChatBottomSheet({super.key});
@@ -303,8 +302,7 @@ class _ChatBubble extends StatelessWidget {
                 ),
                 if (message.data != null && message.data!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  // _DataTable(data: message.data!),
-                  _MdContent(data: message.dataMD!),
+                  _DataTable(data: message.data!),
                 ],
               ],
             ),
@@ -314,7 +312,6 @@ class _ChatBubble extends StatelessWidget {
             CircleAvatar(
               radius: 16,
               backgroundImage: AssetImage('assets/images/belal.jpeg'),
-              child: const Icon(Icons.person, size: 16, color: Colors.white),
             ),
           ],
         ],
@@ -373,17 +370,5 @@ class _DataTable extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-// shows data in user friendly maerkdown
-class _MdContent extends StatelessWidget {
-  final String data;
-
-  const _MdContent({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    return MarkdownWidget(data: data);
   }
 }

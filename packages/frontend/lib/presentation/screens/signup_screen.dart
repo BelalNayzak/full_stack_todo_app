@@ -90,7 +90,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           const SizedBox(height: 24),
                           Text(
-                            'Version 1.0.0',
+                            projectVersion,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: Colors.grey),
                           ),
@@ -222,7 +222,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   Spacer(),
                   Text(
-                    'Version 1.0.0',
+                    projectVersion,
                     textAlign: TextAlign.center,
                     style: Theme.of(
                       context,

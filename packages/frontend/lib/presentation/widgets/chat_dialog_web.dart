@@ -323,8 +323,7 @@ class _ChatBubble extends StatelessWidget {
             const SizedBox(width: 12),
             CircleAvatar(
               radius: 20,
-              backgroundColor: theme.colorScheme.secondary,
-              child: const Icon(Icons.person, size: 20, color: Colors.white),
+              backgroundImage: AssetImage('assets/images/belal.jpeg'),
             ),
           ],
         ],

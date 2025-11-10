@@ -1,5 +1,6 @@
 export 'package:equatable/equatable.dart';
 export 'package:json_annotation/json_annotation.dart';
+export 'package:shared/src/constants/constants.dart';
 export 'package:shared/src/enums/todo_enum.dart';
 export 'package:shared/src/extensions/empty_or_null_string_ext.dart';
 export 'package:shared/src/extensions/not_positive_or_null_num_ext.dart';

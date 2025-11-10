@@ -66,6 +66,11 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
+  // Clear user data
+  void clearUserData() {
+    emit(UserState());
+  }
+
   // Clear error message
   void clearError() {
     emit(state.copyWith(error: null));

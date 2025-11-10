@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart' as dio;
 import 'package:frontend_flutter/frontend.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,8 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width >= 900;
-
-    chatWithData(3, 'how many todos are there ?');
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -92,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 24),
                           Text(
-                            'Version 1.0.0',
+                            projectVersion,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: Colors.grey),
                           ),
@@ -145,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   Spacer(),
                   Text(
-                    'Version 1.0.0',
+                    projectVersion,
                     style: Theme.of(
                       context,
                     ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
@@ -240,105 +235,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
-
-Future<void> chatWithData(int userId, String userMsg) async {
-  try {
-    final prompt = _buildAiPrompt(userId, userMsg);
-    print('xxxxxxxxx 00 : $prompt');
-
-    // 2️⃣ Call LLM (Gemeni)
-    final llmResponse = await dio.Dio().post(
-      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyAWhc9SlOvXlWtl3HOViBPFWcMzs08NiAo',
-      options: dio.Options(headers: {'Content-Type': 'application/json'}),
-      data: jsonEncode({
-        'contents': [
-          {
-            'parts': [
-              {'text': prompt},
-            ],
-          },
-        ],
-      }),
-    );
-
-    print('xxxxxxxxx 01 : ');
-
-    final content =
-        llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
-
-    final cleaned = content
-        .replaceAll(RegExp(r'```json'), '')
-        .replaceAll(RegExp(r'```'), '')
-        .trim();
-
-    final llmParsedData = jsonDecode(cleaned);
-
-    final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
-    final sqlGeneratedQueryParams = llmParsedData['params'];
-    final sqlGeneratedQueryMsg = llmParsedData['summary'];
-
-    // 3️⃣ Safety checks
-    if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
-      throw Exception({'Unsafe SQL Query.'});
-    }
-
-    print('xxxxxxxxx 1 : $sqlGeneratedQuery');
-    print('xxxxxxxxx 2 : $sqlGeneratedQueryParams');
-    print('xxxxxxxxx 3 : $sqlGeneratedQueryMsg');
-
-    // // 4️⃣ Excecute query to supabase (Postgres)
-    // final result = await connPool.execute(
-    //   Sql.named(sqlGeneratedQuery),
-    //   parameters: sqlGeneratedQueryParams,
-    // );
-
-    // final data = result.map((record) => record.toColumnMap()).toList();
-
-    // return ChatResponseModel(
-    //   usedQuery: sqlGeneratedQuery,
-    //   usedQueryParams: sqlGeneratedQueryParams,
-    //   responseMsg: sqlGeneratedQueryMsg,
-    //   responseData: data,
-    // );
-  } on dio.DioException catch (e) {
-    print('❌ Dio error: ${e.response?.data}');
-    print('❌ Status code: ${e.response?.statusCode}');
-    print('❌ Message: ${e.message}');
-  }
-}
-
-String _buildAiPrompt(int userId, String userMsg) {
-  return '''
-          You are a SQL generator for Postgres.
-          Return ONLY valid JSON (no markdown, no code fences, no explanations).
-          When generating SQL, always:
-          - Use single quotes ('...') for string values.
-          - Do NOT use double quotes for strings.
-          - Do NOT wrap keywords like SELECT, FROM, WHERE in quotes.
-          - Wrap table names and column names like todo, user in double quotes.
-          - Use User's ID to get ONLY user's related data (knowing that: user_id = $userId).
-          - Do NOT get any data that is not attached to that user (user in not authorized to get any data not attached to him somehow).
-
-          Return JSON in this format:
-          {
-            "sql": "...",
-            "params": {
-              "key": value,
-              ...
-            },
-            "summary": "..."
-          }
-          Allowed only SELECT queries. Never modify data.
-
-          Schema example:
-          table todo(id int, user_id int, title text, desc text, status text, priority text)
-          table user(id int, name text, email text, password text)
-
-          Knowing that:
-          - The status in the todo table must be string a value of these values only ("todo", "inProgress", "done")
-          - The priority in the todo table must be a string value of these values only ("low", "medium", "high")
-
-          User request: "$userMsg"
-        ''';
 }

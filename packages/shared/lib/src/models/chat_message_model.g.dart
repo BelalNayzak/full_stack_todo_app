@@ -12,7 +12,6 @@ ChatMessageModel _$ChatMessageModelFromJson(Map<String, dynamic> json) =>
       isUser: json['isUser'] as bool,
       timestamp: DateTime.parse(json['timestamp'] as String),
       data: json['data'] as List<dynamic>?,
-      dataMD: json['dataMD'] as String?,
     );
 
 Map<String, dynamic> _$ChatMessageModelToJson(ChatMessageModel instance) =>
@@ -21,5 +20,4 @@ Map<String, dynamic> _$ChatMessageModelToJson(ChatMessageModel instance) =>
       'isUser': instance.isUser,
       'timestamp': instance.timestamp.toIso8601String(),
       'data': instance.data,
-      'dataMD': instance.dataMD,
     };

@@ -8,14 +8,12 @@ class ChatMessageModel extends Equatable {
   final bool isUser;
   final DateTime timestamp;
   final List<dynamic>? data;
-  final String? dataMD;
 
   const ChatMessageModel({
     required this.text,
     required this.isUser,
     required this.timestamp,
     this.data,
-    this.dataMD,
   });
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) =>

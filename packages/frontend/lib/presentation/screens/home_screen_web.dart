@@ -263,6 +263,7 @@ class _Sidebar extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              context.read<UserCubit>().clearUserData();
               context.read<AuthCubit>().logout();
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
