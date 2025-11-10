@@ -14,6 +14,10 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
   @override
   Future<ChatResponseModel> chatWithData(int userId, String userMsg) async {
+    String sqlGeneratedQuery = '';
+    Map<String, dynamic> sqlGeneratedQueryParams = {};
+    String sqlGeneratedQueryMsg = '';
+
     try {
       // 2️⃣ Call LLM (Gemeni)
       final llmResponse = await dio.Dio().post(
@@ -40,9 +44,9 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
       final llmParsedData = jsonDecode(cleaned);
 
-      final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
-      final sqlGeneratedQueryParams = llmParsedData['params'];
-      final sqlGeneratedQueryMsg = llmParsedData['summary'];
+      sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
+      sqlGeneratedQueryParams = llmParsedData['params'];
+      sqlGeneratedQueryMsg = llmParsedData['summary'];
 
       // 3️⃣ Safety checks
       if (sqlGeneratedQuery.toLowerCase().contains('delete') ||
@@ -67,13 +71,16 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
         responseData: data,
       );
     } on dio.DioException catch (e) {
-      throw {
-        '❌ Dio error: ${e.response?.data}',
-        '❌ Status code: ${e.response?.statusCode}',
-        '❌ Message: ${e.message}',
-      };
+      throw Exception({
+        'Dio error': e.response?.data,
+        'Status code': e.response?.statusCode,
+        'Message': e.message,
+        'sqlGeneratedQuery': sqlGeneratedQuery,
+        'sqlGeneratedQueryParams': sqlGeneratedQueryParams,
+        'sqlGeneratedQueryMsg': sqlGeneratedQueryMsg,
+      });
     } catch (e) {
-      throw {'❌ Other error: ${e.toString()}'};
+      throw Exception({'Other error': e.toString()});
     }
   }
 
