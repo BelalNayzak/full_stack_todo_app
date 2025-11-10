@@ -14,54 +14,62 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
   @override
   Future<ChatResponseModel> chatWithData(int userId, String userMsg) async {
-    // 2️⃣ Call LLM (Gemeni)
-    final llmResponse = await dio.Dio().post(
-      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
-      options: dio.Options(headers: {'Content-Type': 'application/json'}),
-      data: jsonEncode({
-        'contents': [
-          {
-            'parts': [
-              {'text': _buildAiPrompt(userId, userMsg)},
-            ],
-          },
-        ],
-      }),
-    );
+    try {
+      // 2️⃣ Call LLM (Gemeni)
+      final llmResponse = await dio.Dio().post(
+        'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${EnvConfigs.gemeniKey}',
+        options: dio.Options(headers: {'Content-Type': 'application/json'}),
+        data: jsonEncode({
+          'contents': [
+            {
+              'parts': [
+                {'text': _buildAiPrompt(userId, userMsg)},
+              ],
+            },
+          ],
+        }),
+      );
 
-    final content =
-        llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
+      final content =
+          llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
 
-    final cleaned = content
-        .replaceAll(RegExp(r'```json'), '')
-        .replaceAll(RegExp(r'```'), '')
-        .trim();
+      final cleaned = content
+          .replaceAll(RegExp(r'```json'), '')
+          .replaceAll(RegExp(r'```'), '')
+          .trim();
 
-    final llmParsedData = jsonDecode(cleaned);
+      final llmParsedData = jsonDecode(cleaned);
 
-    final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
-    final sqlGeneratedQueryParams = llmParsedData['params'];
-    final sqlGeneratedQueryMsg = llmParsedData['summary'];
+      final sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
+      final sqlGeneratedQueryParams = llmParsedData['params'];
+      final sqlGeneratedQueryMsg = llmParsedData['summary'];
 
-    // 3️⃣ Safety checks
-    if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
-      throw Exception({'Unsafe SQL Query.'});
+      // 3️⃣ Safety checks
+      if (!sqlGeneratedQuery.toLowerCase().startsWith('select')) {
+        throw Exception({'Unsafe SQL Query.'});
+      }
+
+      // 4️⃣ Excecute query to supabase (Postgres)
+      final result = await connPool.execute(
+        Sql.named(sqlGeneratedQuery),
+        parameters: sqlGeneratedQueryParams,
+      );
+
+      final data = result.map((record) => record.toColumnMap()).toList();
+
+      return ChatResponseModel(
+        usedQuery: sqlGeneratedQuery,
+        usedQueryParams: sqlGeneratedQueryParams,
+        responseMsg: sqlGeneratedQueryMsg,
+        responseData: data,
+      );
+    } on dio.DioException catch (e) {
+      throw {
+        '❌ Dio error: ${e.response?.data}',
+        '❌ Status code: ${e.response?.statusCode}',
+        '❌ Message: ${e.message}',
+      };
     }
-
-    // 4️⃣ Excecute query to supabase (Postgres)
-    final result = await connPool.execute(
-      Sql.named(sqlGeneratedQuery),
-      parameters: sqlGeneratedQueryParams,
-    );
-
-    final data = result.map((record) => record.toColumnMap()).toList();
-
-    return ChatResponseModel(
-      usedQuery: sqlGeneratedQuery,
-      usedQueryParams: sqlGeneratedQueryParams,
-      responseMsg: sqlGeneratedQueryMsg,
-      responseData: data,
-    );
   }
 
   ///
@@ -140,7 +148,7 @@ String _buildAiPrompt(int userId, String userMsg) {
           - Do NOT wrap keywords like SELECT, FROM, WHERE in quotes.
           - Wrap table names and column names like todo, user in double quotes.
           - Use User's ID to get ONLY user's related data (knowing that: user_id = $userId).
-          - Do NOT ge any data that is not attached to that user (user in not authorized to get any data not attached to him somehow).
+          - Do NOT get any data that is not attached to that user (user in not authorized to get any data not attached to him somehow).
 
           Return JSON in this format:
           {
