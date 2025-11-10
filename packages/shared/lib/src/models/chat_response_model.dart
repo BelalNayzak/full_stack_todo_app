@@ -3,8 +3,9 @@ import 'package:shared/shared.dart';
 part 'chat_response_model.g.dart';
 
 @JsonSerializable()
-class ChatResponseModel {
-  final List<Map<String, dynamic>> responseData;
+class ChatResponseModel extends Equatable {
+  final List<Map<String, dynamic>>? responseData;
+  final String? responseDataMD;
   final String? responseMsg;
   final String? usedQuery;
   final Map<String, dynamic>? usedQueryParams;
@@ -12,6 +13,7 @@ class ChatResponseModel {
   const ChatResponseModel({
     required this.responseMsg,
     required this.responseData,
+    required this.responseDataMD,
     required this.usedQuery,
     required this.usedQueryParams,
   });
@@ -20,4 +22,13 @@ class ChatResponseModel {
       _$ChatResponseModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChatResponseModelToJson(this);
+
+  @override
+  List<Object?> get props => [
+    responseData,
+    responseDataMD,
+    responseMsg,
+    usedQuery,
+    usedQueryParams,
+  ];
 }

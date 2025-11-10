@@ -160,7 +160,7 @@ class HomeScreenWeb extends StatelessWidget {
             Expanded(
               child: _BoardColumn(
                 title: 'Todo',
-                color: Colors.grey,
+                color: Colors.blue,
                 items: state.todos
                     .where((t) => t.status == TodoStatus.todo)
                     .toList(),
@@ -170,7 +170,7 @@ class HomeScreenWeb extends StatelessWidget {
             Expanded(
               child: _BoardColumn(
                 title: 'In Progress',
-                color: Colors.blue,
+                color: Colors.yellow,
                 items: state.todos
                     .where((t) => t.status == TodoStatus.inProgress)
                     .toList(),

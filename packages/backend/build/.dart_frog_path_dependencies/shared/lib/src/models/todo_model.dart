@@ -3,7 +3,7 @@ import 'package:shared/shared.dart';
 part 'todo_model.g.dart';
 
 @JsonSerializable()
-class TodoModel {
+class TodoModel extends Equatable {
   final int? id;
   @JsonKey(name: 'user_id')
   final int? userIdFKey;
@@ -25,4 +25,7 @@ class TodoModel {
       _$TodoModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$TodoModelToJson(this);
+
+  @override
+  List<Object?> get props => [id, userIdFKey, title, desc, priority, status];
 }

@@ -1,5 +1,6 @@
 import 'package:frontend_flutter/frontend.dart';
 import 'package:intl/intl.dart';
+import 'package:markdown_widget/widget/markdown.dart';
 
 class ChatBottomSheet extends StatefulWidget {
   const ChatBottomSheet({super.key});
@@ -38,7 +39,7 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
     final userId = context.read<UserCubit>().state.user?.id;
     if (userId == null) return;
 
-    context.read<ChatCubit>().sendMessage(message, userId);
+    context.read<ChatCubit>().sendMessage(userId, message);
     _messageController.clear();
     _scrollToBottom();
   }
@@ -51,6 +52,7 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
       maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
+        // 1346 // 1360
         return Container(
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
@@ -83,14 +85,14 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                 Text(
                   'Chat Your Data',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   'Ask questions about your todos',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                 ),
               ],
             ),
@@ -125,18 +127,12 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                 const SizedBox(height: 16),
                 Text(
                   'Start a conversation',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Ask me anything about your todos',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 ),
               ],
             ),
@@ -248,7 +244,7 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
 }
 
 class _ChatBubble extends StatelessWidget {
-  final ChatMessage message;
+  final ChatMessageModel message;
 
   const _ChatBubble({required this.message});
 
@@ -260,8 +256,9 @@ class _ChatBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -274,8 +271,9 @@ class _ChatBubble extends StatelessWidget {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -305,7 +303,8 @@ class _ChatBubble extends StatelessWidget {
                 ),
                 if (message.data != null && message.data!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  _DataTable(data: message.data!),
+                  // _DataTable(data: message.data!),
+                  _MdContent(data: message.dataMD!),
                 ],
               ],
             ),
@@ -314,7 +313,7 @@ class _ChatBubble extends StatelessWidget {
             const SizedBox(width: 8),
             CircleAvatar(
               radius: 16,
-              backgroundColor: theme.colorScheme.secondary,
+              backgroundImage: AssetImage('assets/images/belal.jpeg'),
               child: const Icon(Icons.person, size: 16, color: Colors.white),
             ),
           ],
@@ -324,6 +323,7 @@ class _ChatBubble extends StatelessWidget {
   }
 }
 
+// shows data as data table
 class _DataTable extends StatelessWidget {
   final List<dynamic> data;
 
@@ -352,24 +352,38 @@ class _DataTable extends StatelessWidget {
           dataRowMinHeight: 35,
           dataRowMaxHeight: 50,
           columns: columns
-              .map((col) => DataColumn(
-                    label: Text(
-                      col.toString(),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ))
+              .map(
+                (col) => DataColumn(
+                  label: Text(
+                    col.toString(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              )
               .toList(),
           rows: data
-              .map((row) => DataRow(
-                    cells: columns
-                        .map((col) => DataCell(
-                              Text(row[col]?.toString() ?? ''),
-                            ))
-                        .toList(),
-                  ))
+              .map(
+                (row) => DataRow(
+                  cells: columns
+                      .map((col) => DataCell(Text(row[col]?.toString() ?? '')))
+                      .toList(),
+                ),
+              )
               .toList(),
         ),
       ),
     );
+  }
+}
+
+// shows data in user friendly maerkdown
+class _MdContent extends StatelessWidget {
+  final String data;
+
+  const _MdContent({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return MarkdownWidget(data: data);
   }
 }

@@ -37,10 +37,10 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       final content =
           llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
 
-      final cleaned = content
-          .replaceAll(RegExp(r'```json'), '')
-          .replaceAll(RegExp(r'```'), '')
-          .trim();
+      final cleaned = content;
+      // .replaceAll(RegExp(r'```json'), '')
+      // .replaceAll(RegExp(r'```'), '')
+      // .trim();
 
       final llmParsedData = jsonDecode(cleaned);
 
@@ -68,7 +68,8 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
         usedQuery: sqlGeneratedQuery,
         usedQueryParams: sqlGeneratedQueryParams,
         responseMsg: sqlGeneratedQueryMsg,
-        responseData: data,
+        responseData: null,
+        responseDataMD: data.toString(),
       );
     } on dio.DioException catch (e) {
       throw Exception({
@@ -156,9 +157,10 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
 // 1️⃣ Build prompt for LLM
 String _buildAiPrompt(int userId, String userMsg) {
+  // Return ONLY valid JSON (no markdown, no code fences, no explanations).
   return '''
           You are a SQL generator for Postgres.
-          Return ONLY valid JSON (no markdown, no code fences, no explanations).
+          Return a response that is JUST ONLY a valid Markdown (to be retreived in the flutter app with the ).
           When generating SQL, always:
           - Use single quotes ('...') for string values.
           - Do NOT use double quotes for strings.

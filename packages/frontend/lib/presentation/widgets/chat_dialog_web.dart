@@ -38,7 +38,7 @@ class _ChatDialogWebState extends State<ChatDialogWeb> {
     final userId = context.read<UserCubit>().state.user?.id;
     if (userId == null) return;
 
-    context.read<ChatCubit>().sendMessage(message, userId);
+    context.read<ChatCubit>().sendMessage(userId, message);
     _messageController.clear();
     _scrollToBottom();
   }
@@ -74,7 +74,9 @@ class _ChatDialogWebState extends State<ChatDialogWeb> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -89,15 +91,15 @@ class _ChatDialogWebState extends State<ChatDialogWeb> {
               children: [
                 Text(
                   'Chat Your Data',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   'Ask questions about your todos',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                 ),
               ],
             ),
@@ -142,10 +144,7 @@ class _ChatDialogWebState extends State<ChatDialogWeb> {
                 const SizedBox(height: 12),
                 Text(
                   'Ask me anything about your todos',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 ),
               ],
             ),
@@ -196,10 +195,7 @@ class _ChatDialogWebState extends State<ChatDialogWeb> {
                 const SizedBox(width: 12),
                 Text(
                   'Thinking...',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 ),
               ],
             ),
@@ -258,7 +254,7 @@ class _ChatDialogWebState extends State<ChatDialogWeb> {
 }
 
 class _ChatBubble extends StatelessWidget {
-  final ChatMessage message;
+  final ChatMessageModel message;
 
   const _ChatBubble({required this.message});
 
@@ -270,8 +266,9 @@ class _ChatBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -284,8 +281,9 @@ class _ChatBubble extends StatelessWidget {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -363,27 +361,33 @@ class _DataTable extends StatelessWidget {
           dataRowMinHeight: 40,
           dataRowMaxHeight: 55,
           columns: columns
-              .map((col) => DataColumn(
-                    label: Text(
-                      col.toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
+              .map(
+                (col) => DataColumn(
+                  label: Text(
+                    col.toString(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
                     ),
-                  ))
+                  ),
+                ),
+              )
               .toList(),
           rows: data
-              .map((row) => DataRow(
-                    cells: columns
-                        .map((col) => DataCell(
-                              Text(
-                                row[col]?.toString() ?? '',
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                            ))
-                        .toList(),
-                  ))
+              .map(
+                (row) => DataRow(
+                  cells: columns
+                      .map(
+                        (col) => DataCell(
+                          Text(
+                            row[col]?.toString() ?? '',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              )
               .toList(),
         ),
       ),

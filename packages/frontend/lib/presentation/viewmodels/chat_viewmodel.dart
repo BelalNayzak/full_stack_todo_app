@@ -1,24 +1,7 @@
 import 'package:frontend_flutter/frontend.dart';
 
-class ChatMessage extends Equatable {
-  final String text;
-  final bool isUser;
-  final DateTime timestamp;
-  final List<dynamic>? data;
-
-  const ChatMessage({
-    required this.text,
-    required this.isUser,
-    required this.timestamp,
-    this.data,
-  });
-
-  @override
-  List<Object?> get props => [text, isUser, timestamp, data];
-}
-
 class ChatState extends Equatable {
-  final List<ChatMessage> messages;
+  final List<ChatMessageModel> messages;
   final bool isLoading;
   final String? error;
 
@@ -29,7 +12,7 @@ class ChatState extends Equatable {
   });
 
   ChatState copyWith({
-    List<ChatMessage>? messages,
+    List<ChatMessageModel>? messages,
     bool? isLoading,
     String? error,
   }) {
@@ -49,19 +32,21 @@ class ChatCubit extends Cubit<ChatState> {
 
   ChatCubit(this._chatService) : super(const ChatState());
 
-  Future<void> sendMessage(String message, int userId) async {
+  Future<void> sendMessage(int userId, String message) async {
     // Add user message
-    final userMessage = ChatMessage(
+    final userMessage = ChatMessageModel(
       text: message,
       isUser: true,
       timestamp: DateTime.now(),
     );
 
-    emit(state.copyWith(
-      messages: [...state.messages, userMessage],
-      isLoading: true,
-      error: null,
-    ));
+    emit(
+      state.copyWith(
+        messages: [...state.messages, userMessage],
+        isLoading: true,
+        error: null,
+      ),
+    );
 
     try {
       final response = await _chatService.sendMessage(
@@ -70,24 +55,38 @@ class ChatCubit extends Cubit<ChatState> {
       );
 
       // Add AI response
-      final aiMessage = ChatMessage(
+      final aiMessage = ChatMessageModel(
         text: response.message,
         isUser: false,
         timestamp: DateTime.now(),
         data: response.data,
       );
 
-      emit(state.copyWith(
-        messages: [...state.messages, aiMessage],
-        isLoading: false,
-      ));
+      emit(
+        state.copyWith(
+          messages: [...state.messages, aiMessage],
+          isLoading: false,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        error: e is NetworkException
-            ? e.message
-            : 'Failed to send message',
-      ));
+      emit(
+        state.copyWith(
+          messages: [
+            ...state.messages,
+            ChatMessageModel(
+              text: e is NetworkException
+                  ? e.message
+                  : 'Failed to send message, Try again later.',
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          ],
+          isLoading: false,
+          error: e is NetworkException
+              ? e.message
+              : 'Failed to send message, Try again later.',
+        ),
+      );
     }
   }
 
