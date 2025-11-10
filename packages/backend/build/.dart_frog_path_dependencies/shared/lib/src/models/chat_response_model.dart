@@ -5,7 +5,6 @@ part 'chat_response_model.g.dart';
 @JsonSerializable()
 class ChatResponseModel extends Equatable {
   final List<Map<String, dynamic>>? responseData;
-  final String? responseDataMD;
   final String? responseMsg;
   final String? usedQuery;
   final Map<String, dynamic>? usedQueryParams;
@@ -13,7 +12,6 @@ class ChatResponseModel extends Equatable {
   const ChatResponseModel({
     required this.responseMsg,
     required this.responseData,
-    required this.responseDataMD,
     required this.usedQuery,
     required this.usedQueryParams,
   });
@@ -26,7 +24,6 @@ class ChatResponseModel extends Equatable {
   @override
   List<Object?> get props => [
     responseData,
-    responseDataMD,
     responseMsg,
     usedQuery,
     usedQueryParams,
