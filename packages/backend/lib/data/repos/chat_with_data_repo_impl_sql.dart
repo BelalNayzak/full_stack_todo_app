@@ -22,12 +22,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
       // 2️⃣ Call LLM (Gemeni)
       final llmResponseQuery = await _getAiQuery(userId, userMsg);
 
-      _extractDataFromAiResponse(
-        llmResponseQuery,
-        sqlGeneratedQuery,
-        sqlGeneratedQueryParams,
-        aiGeneratedMsg,
-      );
+      _extractDataFromAiResponse(llmResponseQuery);
 
       // 3️⃣ Safety checks
       _assureDatabaseSafeActions(sqlGeneratedQuery);
@@ -52,12 +47,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
         queryChatResponseModel.toJson().toString(),
       );
 
-      _extractDataFromAiResponse(
-        llmResponseMmd,
-        sqlGeneratedQuery,
-        sqlGeneratedQueryParams,
-        aiGeneratedMsg,
-      );
+      _extractDataFromAiResponse(llmResponseMmd);
 
       final mmdChatResponseModel = ChatResponseModel(
         usedQuery: sqlGeneratedQuery,
@@ -102,12 +92,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
     );
   }
 
-  _extractDataFromAiResponse(
-    llmResponse,
-    sqlGeneratedQuery,
-    sqlGeneratedQueryParams,
-    aiGeneratedMsg,
-  ) async {
+  _extractDataFromAiResponse(llmResponse) async {
     final content =
         llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
 
