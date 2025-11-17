@@ -12,12 +12,12 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   /// USING GEMENI : -----------------------------------------------
   ///
 
+  String sqlGeneratedQuery = '';
+  Map<String, dynamic> sqlGeneratedQueryParams = {};
+  String aiGeneratedMsg = ''; // sqlGeneratedQueryMsg || mmdGeneratedMsg
+
   @override
   Future<ChatResponseModel> chatWithData(int userId, String userMsg) async {
-    String sqlGeneratedQuery = '';
-    Map<String, dynamic> sqlGeneratedQueryParams = {};
-    String aiGeneratedMsg = ''; // sqlGeneratedQueryMsg || mmdGeneratedMsg
-
     try {
       // 2️⃣ Call LLM (Gemeni)
       final llmResponseQuery = await _getAiQuery(userId, userMsg);
