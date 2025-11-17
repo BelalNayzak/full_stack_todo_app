@@ -16,7 +16,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
   Future<ChatResponseModel> chatWithData(int userId, String userMsg) async {
     String sqlGeneratedQuery = '';
     Map<String, dynamic> sqlGeneratedQueryParams = {};
-    String sqlGeneratedQueryMsg = '';
+    String aiGeneratedMsg = ''; // sqlGeneratedQueryMsg || mmdGeneratedMsg
 
     try {
       // 2️⃣ Call LLM (Gemeni)
@@ -26,7 +26,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
         llmResponseQuery,
         sqlGeneratedQuery,
         sqlGeneratedQueryParams,
-        sqlGeneratedQueryMsg,
+        aiGeneratedMsg,
       );
 
       // 3️⃣ Safety checks
@@ -40,20 +40,29 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
       final data = result.map((record) => record.toColumnMap()).toList();
 
+      final queryChatResponseModel = ChatResponseModel(
+        usedQuery: sqlGeneratedQuery,
+        usedQueryParams: sqlGeneratedQueryParams,
+        responseMsg: aiGeneratedMsg,
+        responseData: data,
+      );
+
       // get ai mmd
-      final llmResponseMmd = await _getAiMmd(userMsg);
+      final llmResponseMmd = await _getAiMmd(
+        queryChatResponseModel.toJson().toString(),
+      );
 
       _extractDataFromAiResponse(
         llmResponseMmd,
         sqlGeneratedQuery,
         sqlGeneratedQueryParams,
-        sqlGeneratedQueryMsg,
+        aiGeneratedMsg,
       );
 
       final mmdChatResponseModel = ChatResponseModel(
         usedQuery: sqlGeneratedQuery,
         usedQueryParams: sqlGeneratedQueryParams,
-        responseMsg: sqlGeneratedQueryMsg,
+        responseMsg: aiGeneratedMsg,
         responseData: data,
       );
 
@@ -65,14 +74,14 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
         'Message': e.message,
         'sqlGeneratedQuery': sqlGeneratedQuery,
         'sqlGeneratedQueryParams': sqlGeneratedQueryParams,
-        'sqlGeneratedQueryMsg': sqlGeneratedQueryMsg,
+        'aiGeneratedMsg': aiGeneratedMsg,
       });
     } catch (e) {
       throw Exception({
         'Other error': e.toString(),
         'sqlGeneratedQuery': sqlGeneratedQuery,
         'sqlGeneratedQueryParams': sqlGeneratedQueryParams,
-        'sqlGeneratedQueryMsg': sqlGeneratedQueryMsg,
+        'aiGeneratedMsg': aiGeneratedMsg,
       });
     }
   }
@@ -97,7 +106,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
     llmResponse,
     sqlGeneratedQuery,
     sqlGeneratedQueryParams,
-    sqlGeneratedQueryMsg,
+    aiGeneratedMsg,
   ) async {
     final content =
         llmResponse.data['candidates'][0]['content']['parts'][0]['text'];
@@ -111,7 +120,7 @@ class ChatWithDataRepoImplSQL implements ChatWithDataRepo {
 
     sqlGeneratedQuery = (llmParsedData['sql'] as String).trim();
     sqlGeneratedQueryParams = llmParsedData['params'];
-    sqlGeneratedQueryMsg = llmParsedData['summary'];
+    aiGeneratedMsg = llmParsedData['summary'];
   }
 
   _getAiMmd(String userMsg) async {
